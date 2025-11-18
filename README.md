@@ -36,43 +36,140 @@
 <p align="center" style="color:grey;"><i>Get started with Kestra in 3 minutes.</i></p>
 
 
-# Kestra Plugin Template
+# Kestra Plugin for Coda
 
-> A template for creating Kestra plugins
+> A Kestra plugin for integrating with Coda documents and tables
 
-This repository serves as a general template for creating a new [Kestra](https://github.com/kestra-io/kestra) plugin. It should take only a few minutes! Use this repository as a scaffold to ensure that you've set up the plugin correctly, including unit tests and CI/CD workflows.
+This plugin enables Kestra workflows to interact with [Coda](https://coda.io) documents through the Coda API. It provides tasks for managing tables, columns, rows, and triggering automations.
 
 ![Kestra orchestrator](https://kestra.io/video.gif)
 
-## Running the project in local
+## Features
+
+- **Table Operations**: List and discover tables in Coda documents
+- **Column Management**: Retrieve column configurations and metadata
+- **Row Operations**: Insert, update, upsert, and delete rows in Coda tables
+- **Automations**: Trigger Coda automations via webhooks
+- **Data Retrieval**: Query and fetch data from Coda tables with pagination support
+
+## Documentation
+
+📚 **For Developers**: Comprehensive documentation is available in the [`docs/`](./docs/) directory:
+
+- **[Getting Started](./docs/GETTING_STARTED.md)** - 🚀 Start here! Step-by-step guide including:
+  - Development environment setup
+  - Creating your first task
+  - Testing strategies
+  - Local development with Kestra
+
+- **[Coda API Guide](./docs/CODA_API_GUIDE.md)** - Complete reference for Coda API including:
+  - Authentication and setup
+  - Tables, columns, and rows operations
+  - Comments limitations and workarounds
+  - Automations and webhooks
+  - Code examples and best practices
+  
+- **[Quick Reference](./docs/QUICK_REFERENCE.md)** - Handy cheat sheet with:
+  - Common API endpoints
+  - Request/response examples
+  - Column types and query parameters
+  
+- **[Implementation Roadmap](./docs/IMPLEMENTATION_ROADMAP.md)** - Development guide including:
+  - Phase-by-phase implementation plan
+  - Task specifications and examples
+  - Testing strategy
+  - Timeline estimates
+
+## Quick Start
+
+### Authentication
+
+To use this plugin, you need a Coda API token:
+
+1. Sign in to your Coda account
+2. Go to Account Settings → Developer/API Settings
+3. Generate a new API token
+4. Store it securely in Kestra's secret management
+
+### Example Usage
+
+```yaml
+id: coda-example
+namespace: io.kestra.plugin.coda
+
+tasks:
+  - id: list_tables
+    type: io.kestra.plugin.coda.ListTables
+    apiToken: "{{ secret('CODA_API_TOKEN') }}"
+    docId: "abc123xyz"
+```
+
+## Supported Operations
+
+### Read Operations
+- List tables in a document
+- List columns in a table
+- Retrieve rows with filtering and pagination
+
+### Write Operations
+- Insert new rows
+- Update existing rows
+- Upsert rows (insert or update based on key)
+- Delete rows
+
+### Automation
+- Trigger webhook-based automations
+
+## API Limitations
+
+⚠️ Please note the following Coda API limitations:
+
+- **Cannot create tables** programmatically (only list existing tables)
+- **Comments are not accessible** via the API
+- **Views are read-only** (use base tables for modifications)
+- Rate limits apply (not publicly documented by Coda)
+
+## Running the project locally
+
 ### Prerequisites
 - Java 21
 - Docker
 
 ### Running tests
-```
+```bash
 ./gradlew check --parallel
 ```
 
 ### Development
 
-`VSCode`:
+**VSCode:**
 
 Follow the README.md within the `.devcontainer` folder for a quick and easy way to get up and running with developing plugins if you are using VSCode.
 
-`Other IDEs`:
+**Other IDEs:**
 
-```
+```bash
 ./gradlew shadowJar && docker build -t kestra-custom . && docker run --rm -p 8080:8080 kestra-custom server local
 ```
 > [!NOTE]
-> You need to relaunch this whole command everytime you make a change to your plugin
+> You need to relaunch this whole command every time you make a change to your plugin
 
-go to http://localhost:8080, your plugin will be available to use
+Go to http://localhost:8080, your plugin will be available to use.
 
-## Documentation
-* Full documentation can be found under: [kestra.io/docs](https://kestra.io/docs)
-* Documentation for developing a plugin is included in the [Plugin Developer Guide](https://kestra.io/docs/plugin-developer-guide/)
+## Additional Resources
+
+### Coda Resources
+* **Coda API Documentation**: [https://coda.io/developers](https://coda.io/developers)
+* **Getting Started Guide**: [https://coda.io/@oleg/getting-started-guide-coda-api](https://coda.io/@oleg/getting-started-guide-coda-api)
+* **Coda Community**: [https://community.coda.io/](https://community.coda.io/)
+
+### Kestra Resources
+* **Full documentation**: [kestra.io/docs](https://kestra.io/docs)
+* **Plugin Developer Guide**: [https://kestra.io/docs/plugin-developer-guide/](https://kestra.io/docs/plugin-developer-guide/)
+
+## Contributing
+
+We welcome contributions! Please see the [Implementation Roadmap](./docs/IMPLEMENTATION_ROADMAP.md) for development guidelines and planned features.
 
 
 ## License
