@@ -56,6 +56,12 @@ This plugin enables Kestra workflows to interact with [Coda](https://coda.io) do
 
 📚 **For Developers**: Comprehensive documentation is available in the [`docs/`](./docs/) directory:
 
+- **[Getting Started](./docs/GETTING_STARTED.md)** - 🚀 Start here! Step-by-step guide including:
+  - Development environment setup
+  - Creating your first task
+  - Testing strategies
+  - Local development with Kestra
+
 - **[Coda API Guide](./docs/CODA_API_GUIDE.md)** - Complete reference for Coda API including:
   - Authentication and setup
   - Tables, columns, and rows operations
