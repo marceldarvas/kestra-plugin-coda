@@ -93,15 +93,52 @@ To use this plugin, you need a Coda API token:
 
 ### Example Usage
 
+#### List Tables
 ```yaml
-id: coda-example
+id: coda-list-tables
 namespace: io.kestra.plugin.coda
 
 tasks:
   - id: list_tables
-    type: io.kestra.plugin.coda.ListTables
+    type: io.kestra.plugin.coda.tables.ListTables
     apiToken: "{{ secret('CODA_API_TOKEN') }}"
     docId: "abc123xyz"
+```
+
+#### Insert Rows
+```yaml
+id: coda-insert-rows
+namespace: io.kestra.plugin.coda
+
+tasks:
+  - id: insert_rows
+    type: io.kestra.plugin.coda.rows.InsertRows
+    apiToken: "{{ secret('CODA_API_TOKEN') }}"
+    docId: "abc123xyz"
+    tableId: "grid-pqRst-U"
+    rows:
+      - cells:
+          - column: "Task Name"
+            value: "My Task"
+          - column: "Status"
+            value: "In Progress"
+```
+
+#### Trigger Webhook Automation
+```yaml
+id: coda-trigger-webhook
+namespace: io.kestra.plugin.coda
+
+tasks:
+  - id: trigger_automation
+    type: io.kestra.plugin.coda.automations.TriggerWebhook
+    apiToken: "{{ secret('CODA_API_TOKEN') }}"
+    webhookUrl: "https://coda.io/apis/v1/webhooks/abc-123-def"
+    payload:
+      taskName: "Complete Documentation"
+      priority: "High"
+      daysRemaining: 5
+      isUrgent: true
 ```
 
 ## Supported Operations
