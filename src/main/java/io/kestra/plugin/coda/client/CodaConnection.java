@@ -2,11 +2,13 @@ package io.kestra.plugin.coda.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.kestra.plugin.coda.exceptions.*;
 import okhttp3.*;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -56,6 +58,24 @@ public class CodaConnection {
             .build();
 
         return executeRequest(request, responseType);
+    }
+
+    /**
+     * Executes a GET request to the Coda API with generic type support.
+     *
+     * @param endpoint The API endpoint (relative to base URL)
+     * @param typeToken The TypeToken for generic types
+     * @return The deserialized response
+     * @throws CodaException if the request fails
+     */
+    public <T> T get(String endpoint, TypeToken<T> typeToken) throws CodaException {
+        String url = buildUrl(endpoint);
+        Request request = new Request.Builder()
+            .url(url)
+            .get()
+            .build();
+
+        return executeRequest(request, typeToken.getType());
     }
 
     /**
@@ -143,6 +163,30 @@ public class CodaConnection {
             }
 
             return gson.fromJson(responseBody, responseType);
+        } catch (IOException e) {
+            throw new CodaException("Failed to execute request: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Executes an HTTP request and handles the response with generic type support.
+     */
+    private <T> T executeRequest(Request request, Type type) throws CodaException {
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "";
+
+            logger.debug("Response code: {}", response.code());
+            logger.debug("Response body: {}", responseBody);
+
+            if (!response.isSuccessful()) {
+                handleErrorResponse(response, responseBody);
+            }
+
+            if (responseBody.isEmpty()) {
+                return null;
+            }
+
+            return gson.fromJson(responseBody, type);
         } catch (IOException e) {
             throw new CodaException("Failed to execute request: " + e.getMessage(), e);
         }
