@@ -1,6 +1,7 @@
 package io.kestra.plugin.coda.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,31 +11,31 @@ import java.util.List;
 
 /**
  * Generic wrapper for paginated responses from the Coda API.
- * @param <T> The type of items in the response
  */
 @Builder
 @Getter
 @Jacksonized
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PagedResponse<T> {
     @Schema(
         title = "Items",
         description = "The list of items in this page"
     )
-    @SerializedName("items")
+    @JsonProperty("items")
     private List<T> items;
 
     @Schema(
         title = "Next Page Token",
         description = "Token to fetch the next page of results"
     )
-    @SerializedName("nextPageToken")
+    @JsonProperty("nextPageToken")
     private String nextPageToken;
 
     @Schema(
         title = "Next Page Link",
         description = "Full URL to fetch the next page of results"
     )
-    @SerializedName("nextPageLink")
+    @JsonProperty("nextPageLink")
     private String nextPageLink;
 
     @Schema(

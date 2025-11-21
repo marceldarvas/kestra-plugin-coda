@@ -1,7 +1,7 @@
 package io.kestra.plugin.coda.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.kestra.plugin.coda.exceptions.*;
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ public class CodaConnection {
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     private final OkHttpClient client;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final Logger logger;
 
     /**
@@ -28,9 +28,8 @@ public class CodaConnection {
      */
     public CodaConnection(String apiToken, Logger logger) {
         this.logger = logger;
-        this.gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+        this.objectMapper = new ObjectMapper()
+            .enable(SerializationFeature.INDENT_OUTPUT);
 
         this.client = new OkHttpClient.Builder()
             .addInterceptor(new AuthInterceptor(apiToken))
@@ -69,7 +68,12 @@ public class CodaConnection {
      */
     public <T> T post(String endpoint, Object requestBody, Class<T> responseType) throws CodaException {
         String url = buildUrl(endpoint);
-        String json = gson.toJson(requestBody);
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(requestBody);
+        } catch (Exception e) {
+            throw new CodaException("Failed to serialize request body: " + e.getMessage(), e);
+        }
 
         logger.debug("POST {} with body: {}", url, json);
 
@@ -93,7 +97,12 @@ public class CodaConnection {
      */
     public <T> T put(String endpoint, Object requestBody, Class<T> responseType) throws CodaException {
         String url = buildUrl(endpoint);
-        String json = gson.toJson(requestBody);
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(requestBody);
+        } catch (Exception e) {
+            throw new CodaException("Failed to serialize request body: " + e.getMessage(), e);
+        }
 
         logger.debug("PUT {} with body: {}", url, json);
 
@@ -142,7 +151,7 @@ public class CodaConnection {
                 return null;
             }
 
-            return gson.fromJson(responseBody, responseType);
+            return objectMapper.readValue(responseBody, responseType);
         } catch (IOException e) {
             throw new CodaException("Failed to execute request: " + e.getMessage(), e);
         }
@@ -161,7 +170,14 @@ public class CodaConnection {
                 throw new CodaResourceNotFoundException("Resource not found: " + response.request().url());
             case 429:
                 String retryAfter = response.header("Retry-After");
-                Integer retrySeconds = retryAfter != null ? Integer.parseInt(retryAfter) : null;
+                Integer retrySeconds = null;
+                if (retryAfter != null) {
+                    try {
+                        retrySeconds = Integer.parseInt(retryAfter);
+                    } catch (NumberFormatException e) {
+                        logger.warn("Invalid Retry-After header value: {}", retryAfter);
+                    }
+                }
                 throw new CodaRateLimitException("Rate limit exceeded", retrySeconds);
             default:
                 String message = String.format("Request failed with status %d: %s", statusCode, responseBody);
