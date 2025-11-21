@@ -116,8 +116,10 @@ public class CodaConnection {
 
     /**
      * Executes a POST request and returns the raw response details.
+     * This method is useful for webhook requests or when you need access to
+     * the raw HTTP status code and response body without deserialization.
      *
-     * @param endpoint The API endpoint (relative to base URL or full URL)
+     * @param endpoint The API endpoint (relative to base URL or full URL for webhooks)
      * @param requestBody The request body object
      * @return A RawResponse containing status code and response body
      * @throws CodaException if the request fails
@@ -297,6 +299,8 @@ public class CodaConnection {
 
     /**
      * Simple class to hold raw HTTP response details.
+     * Used when you need access to the raw status code and response body
+     * without automatic deserialization, such as for webhook responses.
      */
     public static class RawResponse {
         private final int statusCode;
