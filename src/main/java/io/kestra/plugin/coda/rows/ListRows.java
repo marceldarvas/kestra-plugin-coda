@@ -1,9 +1,8 @@
 package io.kestra.plugin.coda.rows;
 
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
@@ -32,7 +31,7 @@ import java.util.List;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -96,32 +95,28 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
         description = "Whether to automatically fetch all pages of results. " +
             "If false, only the first page will be returned. Default is false."
     )
-    @PluginProperty
     @Builder.Default
-    private Boolean fetchAllPages = false;
+    private Property<Boolean> fetchAllPages = Property.of(false);
 
     @Schema(
         title = "Page Limit",
         description = "Maximum number of rows to return per page. Default is 25."
     )
-    @PluginProperty
     @Builder.Default
-    private Integer limit = 25;
+    private Property<Integer> limit = Property.of(25);
 
     @Schema(
         title = "Use Column Names",
         description = "If true, return column values keyed by column name instead of column ID. Default is false."
     )
-    @PluginProperty
     @Builder.Default
-    private Boolean useColumnNames = false;
+    private Property<Boolean> useColumnNames = Property.of(false);
 
     @Schema(
         title = "Value Format",
         description = "The format for cell values. Options: 'simple' (default), 'simpleWithArrays', or 'rich'. " +
             "Use 'rich' to include formatted values and metadata."
     )
-    @PluginProperty
     @Builder.Default
     private Property<String> valueFormat = Property.of("simple");
 
@@ -129,15 +124,13 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
         title = "Visible Only",
         description = "If true, return only visible rows (respecting table filters). Default is false."
     )
-    @PluginProperty
     @Builder.Default
-    private Boolean visibleOnly = false;
+    private Property<Boolean> visibleOnly = Property.of(false);
 
     @Schema(
         title = "Sort By",
         description = "Column ID or name to sort by. Can be prefixed with '-' for descending order."
     )
-    @PluginProperty
     private Property<String> sortBy;
 
     @Override
@@ -147,21 +140,26 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
         String tableIdValue = runContext.render(tableId).as(String.class).orElseThrow();
         CodaConnection connection = createConnection(runContext);
 
+        Boolean rFetchAllPages = runContext.render(fetchAllPages).as(Boolean.class).orElse(false);
+        Integer rLimit = runContext.render(limit).as(Integer.class).orElse(25);
+        Boolean rUseColumnNames = runContext.render(useColumnNames).as(Boolean.class).orElse(false);
+        Boolean rVisibleOnly = runContext.render(visibleOnly).as(Boolean.class).orElse(false);
+
         logger.info("Listing rows for table {} in document {}", tableIdValue, docId);
 
         // Build the endpoint with query parameters
         StringBuilder endpointBuilder = new StringBuilder(
-            String.format("/docs/%s/tables/%s/rows?limit=%d", docId, tableIdValue, limit)
+            String.format("/docs/%s/tables/%s/rows?limit=%d", docId, tableIdValue, rLimit)
         );
 
-        if (useColumnNames) {
+        if (rUseColumnNames) {
             endpointBuilder.append("&useColumnNames=true");
         }
 
         String valueFormatValue = runContext.render(valueFormat).as(String.class).orElse("simple");
         endpointBuilder.append("&valueFormat=").append(valueFormatValue);
 
-        if (visibleOnly) {
+        if (rVisibleOnly) {
             endpointBuilder.append("&visibleOnly=true");
         }
 
@@ -185,7 +183,7 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
 
             PagedResponse<CodaRow> response = connection.get(
                 currentEndpoint,
-                new TypeToken<PagedResponse<CodaRow>>() {}
+                new TypeReference<PagedResponse<CodaRow>>() {}
             );
 
             if (response.getItems() != null) {
@@ -196,7 +194,7 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
             nextPageLink = response.getNextPageLink();
 
             // Only continue if fetchAllPages is true and there are more pages
-            if (!fetchAllPages) {
+            if (!rFetchAllPages) {
                 break;
             }
 
