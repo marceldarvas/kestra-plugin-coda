@@ -2,13 +2,11 @@ package io.kestra.plugin.coda.automations;
 
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.Task;
 import io.kestra.core.runners.RunContext;
-import io.kestra.plugin.coda.exceptions.CodaAuthenticationException;
-import io.kestra.plugin.coda.exceptions.CodaException;
+import io.kestra.plugin.coda.client.CodaConnection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,11 +14,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import okhttp3.*;
 import org.slf4j.Logger;
 
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -112,7 +108,7 @@ import java.util.Map;
         )
     }
 )
-public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.Output> {
+public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.TriggerWebhookOutput> {
 
     @Schema(
         title = "Coda API Token",
@@ -120,7 +116,6 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
             "We recommend using Kestra secrets to store this value securely."
     )
     @NotNull
-    @PluginProperty(dynamic = true)
     protected Property<String> apiToken;
 
     @Schema(
@@ -129,7 +124,6 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
             "Format: https://coda.io/apis/v1/webhooks/{webhookId}"
     )
     @NotNull
-    @PluginProperty(dynamic = true)
     protected Property<String> webhookUrl;
 
     @Schema(
@@ -139,7 +133,6 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
             "Use ParseJSON([Step 1 Result], \"key\") in Coda formulas to extract values."
     )
     @NotNull
-    @PluginProperty(dynamic = true)
     protected Property<Map<String, Object>> payload;
 
     @Schema(
@@ -147,7 +140,6 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
         description = "Connection timeout in seconds. Default is 30 seconds.",
         defaultValue = "30"
     )
-    @PluginProperty
     @Builder.Default
     protected Property<Integer> connectionTimeout = Property.of(30);
 
@@ -156,12 +148,11 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
         description = "Read timeout in seconds. Default is 30 seconds.",
         defaultValue = "30"
     )
-    @PluginProperty
     @Builder.Default
     protected Property<Integer> readTimeout = Property.of(30);
 
     @Override
-    public Output run(RunContext runContext) throws Exception {
+    public TriggerWebhookOutput run(RunContext runContext) throws Exception {
         Logger logger = runContext.logger();
 
         // Render properties
@@ -174,72 +165,23 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
         logger.info("Triggering Coda webhook: {}", renderedWebhookUrl);
         logger.debug("Payload: {}", renderedPayload);
 
-        // Build HTTP client
-        OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(connTimeout, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(rdTimeout, java.util.concurrent.TimeUnit.SECONDS)
+        // Create connection with custom timeouts
+        CodaConnection connection = new CodaConnection(renderedApiToken, logger, connTimeout, rdTimeout);
+
+        // Execute webhook request
+        CodaConnection.RawResponse response = connection.postRaw(renderedWebhookUrl, renderedPayload);
+
+        logger.info("Webhook triggered successfully. Status code: {}", response.getStatusCode());
+
+        return TriggerWebhookOutput.builder()
+            .statusCode(response.getStatusCode())
+            .responseBody(response.getResponseBody())
             .build();
-
-        // Convert payload to JSON
-        String jsonPayload = new com.google.gson.Gson().toJson(renderedPayload);
-
-        // Build request
-        RequestBody body = RequestBody.create(
-            jsonPayload,
-            MediaType.get("application/json; charset=utf-8")
-        );
-
-        Request request = new Request.Builder()
-            .url(renderedWebhookUrl)
-            .post(body)
-            .addHeader("Authorization", "Bearer " + renderedApiToken)
-            .addHeader("Content-Type", "application/json")
-            .build();
-
-        // Execute request
-        try (Response response = client.newCall(request).execute()) {
-            int statusCode = response.code();
-            String responseBody = response.body() != null ? response.body().string() : "";
-
-            logger.debug("Response status code: {}", statusCode);
-            logger.debug("Response body: {}", responseBody);
-
-            if (statusCode == 401 || statusCode == 403) {
-                throw new CodaAuthenticationException(
-                    "Authentication failed. Please check your API token. Status: " + statusCode
-                );
-            }
-
-            if (!response.isSuccessful()) {
-                throw new CodaException(
-                    "Failed to trigger webhook. Status: " + statusCode + ", Response: " + responseBody
-                );
-            }
-
-            logger.info("Webhook triggered successfully. Status code: {}", statusCode);
-
-            return Output.builder()
-                .statusCode(statusCode)
-                .responseBody(responseBody)
-                .webhookUrl(renderedWebhookUrl)
-                .success(true)
-                .build();
-
-        } catch (IOException e) {
-            logger.error("Failed to trigger webhook", e);
-            throw new CodaException("Failed to trigger webhook: " + e.getMessage(), e);
-        }
     }
 
     @Builder
     @Getter
-    public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(
-            title = "Success",
-            description = "Whether the webhook was triggered successfully"
-        )
-        private final boolean success;
-
+    public static class TriggerWebhookOutput implements io.kestra.core.models.tasks.Output {
         @Schema(
             title = "Status Code",
             description = "HTTP status code returned by the webhook endpoint"
@@ -251,11 +193,5 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
             description = "Response body returned by the webhook endpoint"
         )
         private final String responseBody;
-
-        @Schema(
-            title = "Webhook URL",
-            description = "The webhook URL that was triggered"
-        )
-        private final String webhookUrl;
     }
 }
