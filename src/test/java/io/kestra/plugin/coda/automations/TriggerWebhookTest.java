@@ -37,11 +37,10 @@ class TriggerWebhookTest {
             .payload(Property.of(payload))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
-        assertThat(output.getWebhookUrl(), is(notNullValue()));
+        assertThat(output.getResponseBody(), is(notNullValue()));
     }
 
     @Test
@@ -61,10 +60,10 @@ class TriggerWebhookTest {
             .payload(Property.of(payload))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
+        assertThat(output.getResponseBody(), is(notNullValue()));
     }
 
     @Test
@@ -90,10 +89,10 @@ class TriggerWebhookTest {
             .payload(Property.of(payload))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
+        assertThat(output.getResponseBody(), is(notNullValue()));
     }
 
     @Test
@@ -120,10 +119,10 @@ class TriggerWebhookTest {
             .payload(Property.of(payload))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
+        assertThat(output.getResponseBody(), is(notNullValue()));
     }
 
     @Test
@@ -142,10 +141,10 @@ class TriggerWebhookTest {
             .readTimeout(Property.of(60))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
+        assertThat(output.getResponseBody(), is(notNullValue()));
     }
 
     @Test
@@ -164,9 +163,8 @@ class TriggerWebhookTest {
             .payload(Property.of(payload))
             .build();
 
-        TriggerWebhook.Output output = task.run(runContext);
+        TriggerWebhook.TriggerWebhookOutput output = task.run(runContext);
 
-        assertThat(output.isSuccess(), is(true));
         assertThat(output.getStatusCode(), is(202));
         assertThat(output.getResponseBody(), is(notNullValue()));
     }
