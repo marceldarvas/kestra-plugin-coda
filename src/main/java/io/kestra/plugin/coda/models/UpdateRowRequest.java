@@ -1,10 +1,12 @@
 package io.kestra.plugin.coda.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
@@ -14,13 +16,15 @@ import java.util.List;
  */
 @Builder
 @Getter
+@ToString
 @Jacksonized
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateRowRequest {
     @Schema(
         title = "Row",
         description = "The row data to update"
     )
-    @SerializedName("row")
+    @JsonProperty("row")
     private RowData row;
 
     /**
@@ -28,13 +32,15 @@ public class UpdateRowRequest {
      */
     @Builder
     @Getter
+    @ToString
     @Jacksonized
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RowData {
         @Schema(
             title = "Cells",
             description = "The cell values to update"
         )
-        @SerializedName("cells")
+        @JsonProperty("cells")
         @Singular
         private List<CodaRowCell> cells;
     }

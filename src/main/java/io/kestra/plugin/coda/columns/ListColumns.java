@@ -1,9 +1,8 @@
 package io.kestra.plugin.coda.columns;
 
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
@@ -32,7 +31,7 @@ import java.util.List;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -75,17 +74,15 @@ public class ListColumns extends CodaTask implements RunnableTask<ListColumns.Ou
         description = "Whether to automatically fetch all pages of results. " +
             "If false, only the first page will be returned. Default is false."
     )
-    @PluginProperty
     @Builder.Default
-    private Boolean fetchAllPages = false;
+    private Property<Boolean> fetchAllPages = Property.of(false);
 
     @Schema(
         title = "Page Limit",
         description = "Maximum number of columns to return per page. Default is 25."
     )
-    @PluginProperty
     @Builder.Default
-    private Integer limit = 25;
+    private Property<Integer> limit = Property.of(25);
 
     @Override
     public Output run(RunContext runContext) throws Exception {
@@ -94,10 +91,13 @@ public class ListColumns extends CodaTask implements RunnableTask<ListColumns.Ou
         String tableIdValue = runContext.render(tableId).as(String.class).orElseThrow();
         CodaConnection connection = createConnection(runContext);
 
+        Boolean rFetchAllPages = runContext.render(fetchAllPages).as(Boolean.class).orElse(false);
+        Integer rLimit = runContext.render(limit).as(Integer.class).orElse(25);
+
         logger.info("Listing columns for table {} in document {}", tableIdValue, docId);
 
         List<CodaColumn> allColumns = new ArrayList<>();
-        String endpoint = String.format("/docs/%s/tables/%s/columns?limit=%d", docId, tableIdValue, limit);
+        String endpoint = String.format("/docs/%s/tables/%s/columns?limit=%d", docId, tableIdValue, rLimit);
         String nextPageLink = null;
         int pageCount = 0;
 
@@ -109,7 +109,7 @@ public class ListColumns extends CodaTask implements RunnableTask<ListColumns.Ou
 
             PagedResponse<CodaColumn> response = connection.get(
                 currentEndpoint,
-                new TypeToken<PagedResponse<CodaColumn>>() {}
+                new TypeReference<PagedResponse<CodaColumn>>() {}
             );
 
             if (response.getItems() != null) {
@@ -120,7 +120,7 @@ public class ListColumns extends CodaTask implements RunnableTask<ListColumns.Ou
             nextPageLink = response.getNextPageLink();
 
             // Only continue if fetchAllPages is true and there are more pages
-            if (!fetchAllPages) {
+            if (!rFetchAllPages) {
                 break;
             }
 

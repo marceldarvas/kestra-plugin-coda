@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotNull;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(

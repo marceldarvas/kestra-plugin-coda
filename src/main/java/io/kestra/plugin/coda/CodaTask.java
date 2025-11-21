@@ -1,5 +1,6 @@
 package io.kestra.plugin.coda;
 
+import io.kestra.core.http.client.configurations.HttpConfiguration;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.Task;
 import io.kestra.core.runners.RunContext;
@@ -37,6 +38,9 @@ public abstract class CodaTask extends Task {
     @NotNull
     protected Property<String> docId;
 
+    @Schema(title = "The HTTP client configuration.")
+    protected HttpConfiguration options;
+
     /**
      * Creates a new Coda API connection using the provided credentials.
      *
@@ -49,7 +53,7 @@ public abstract class CodaTask extends Task {
         String renderedApiToken = runContext.render(apiToken).as(String.class).orElseThrow();
 
         logger.debug("Creating Coda API connection");
-        return new CodaConnection(renderedApiToken, logger);
+        return new CodaConnection(runContext, renderedApiToken, logger, options);
     }
 
     /**
