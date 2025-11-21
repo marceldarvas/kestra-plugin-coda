@@ -161,8 +161,9 @@ public class UpdateRow extends CodaTask implements RunnableTask<UpdateRow.Output
      */
     private Object renderValue(RunContext runContext, Object value) throws Exception {
         if (value instanceof Property) {
-            Property<?> prop = (Property<?>) value;
-            return runContext.render(prop).as(Object.class).orElse(null);
+            // Render as String to avoid generic type issues
+            // Gson will handle type conversion during JSON serialization
+            return runContext.render((Property<?>) value).as(String.class).orElse(null);
         }
         return value;
     }
