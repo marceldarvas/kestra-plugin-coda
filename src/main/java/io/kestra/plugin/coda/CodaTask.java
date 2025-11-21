@@ -24,7 +24,7 @@ public abstract class CodaTask extends Task {
     @Schema(
         title = "Coda API Token",
         description = "Your Coda API token. Get it from https://coda.io/account. " +
-            "We recommend using Kestra secrets to store this value securely."
+            "Use {{ secret('CODA_API_TOKEN') }} to reference a secret."
     )
     @NotNull
     protected Property<String> apiToken;
