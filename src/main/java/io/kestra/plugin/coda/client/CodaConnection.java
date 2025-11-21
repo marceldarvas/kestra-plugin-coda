@@ -183,7 +183,8 @@ public class CodaConnection {
             return MAPPER.readValue(response.getBody(), responseType);
         } catch (HttpClientResponseException e) {
             handleErrorResponse(e);
-            throw new CodaException("Unexpected error after handling", e);
+            // This line is unreachable but satisfies the compiler since handleErrorResponse always throws
+            return null;
         } catch (Exception e) {
             throw new CodaException("Failed to execute request: " + e.getMessage(), e);
         }
@@ -206,7 +207,8 @@ public class CodaConnection {
             return MAPPER.readValue(response.getBody(), typeReference);
         } catch (HttpClientResponseException e) {
             handleErrorResponse(e);
-            throw new CodaException("Unexpected error after handling", e);
+            // This line is unreachable but satisfies the compiler since handleErrorResponse always throws
+            return null;
         } catch (Exception e) {
             throw new CodaException("Failed to execute request: " + e.getMessage(), e);
         }
