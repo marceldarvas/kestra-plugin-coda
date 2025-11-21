@@ -1,5 +1,6 @@
 package io.kestra.plugin.coda.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.util.Map;
 @Builder
 @Getter
 @Jacksonized
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CodaRow {
     @Schema(
         title = "Row ID",

@@ -31,7 +31,7 @@ import java.util.List;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -112,7 +112,6 @@ public class UpdateRow extends CodaTask implements RunnableTask<UpdateRow.Output
             "Only the specified cells will be updated; other cells in the row will remain unchanged."
     )
     @NotNull
-    @PluginProperty
     private List<CellInput> cells;
 
     @Override

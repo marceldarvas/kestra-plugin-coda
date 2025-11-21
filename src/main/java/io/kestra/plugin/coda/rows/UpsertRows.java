@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -123,7 +123,6 @@ public class UpsertRows extends CodaTask implements RunnableTask<UpsertRows.Outp
             "it will be updated; otherwise, a new row will be inserted."
     )
     @NotNull
-    @PluginProperty
     private List<Property<String>> keyColumns;
 
     @Schema(
@@ -132,7 +131,6 @@ public class UpsertRows extends CodaTask implements RunnableTask<UpsertRows.Outp
             "Column can be specified by column ID (e.g., 'c-abc123') or column name (e.g., 'Task Name')."
     )
     @NotNull
-    @PluginProperty
     private List<RowInput> rows;
 
     @Override

@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -111,7 +111,6 @@ public class InsertRows extends CodaTask implements RunnableTask<InsertRows.Outp
             "Column can be specified by column ID (e.g., 'c-abc123') or column name (e.g., 'Task Name')."
     )
     @NotNull
-    @PluginProperty
     private List<RowInput> rows;
 
     @Override
