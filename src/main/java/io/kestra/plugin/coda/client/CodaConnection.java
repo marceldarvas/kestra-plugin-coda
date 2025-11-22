@@ -29,6 +29,18 @@ public class CodaConnection {
      * @param logger Logger instance for logging
      */
     public CodaConnection(String apiToken, Logger logger) {
+        this(apiToken, logger, 30, 60);
+    }
+
+    /**
+     * Creates a new Coda API connection with custom timeouts.
+     *
+     * @param apiToken The Coda API token for authentication
+     * @param logger Logger instance for logging
+     * @param connectTimeout Connection timeout in seconds
+     * @param readTimeout Read timeout in seconds
+     */
+    public CodaConnection(String apiToken, Logger logger, int connectTimeout, int readTimeout) {
         this.logger = logger;
         this.gson = new GsonBuilder()
             .setPrettyPrinting()
@@ -36,9 +48,9 @@ public class CodaConnection {
 
         this.client = new OkHttpClient.Builder()
             .addInterceptor(new AuthInterceptor(apiToken))
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(connectTimeout, TimeUnit.SECONDS)
+            .readTimeout(readTimeout, TimeUnit.SECONDS)
+            .writeTimeout(readTimeout, TimeUnit.SECONDS)
             .build();
     }
 
@@ -100,6 +112,45 @@ public class CodaConnection {
             .build();
 
         return executeRequest(request, responseType);
+    }
+
+    /**
+     * Executes a POST request and returns the raw response details.
+     * This method is useful for webhook requests or when you need access to
+     * the raw HTTP status code and response body without deserialization.
+     *
+     * @param endpoint The API endpoint (relative to base URL or full URL for webhooks)
+     * @param requestBody The request body object
+     * @return A RawResponse containing status code and response body
+     * @throws CodaException if the request fails
+     */
+    public RawResponse postRaw(String endpoint, Object requestBody) throws CodaException {
+        String url = buildUrl(endpoint);
+        String json = gson.toJson(requestBody);
+
+        logger.debug("POST {} with body: {}", url, json);
+
+        RequestBody body = RequestBody.create(json, JSON_MEDIA_TYPE);
+        Request request = new Request.Builder()
+            .url(url)
+            .post(body)
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            int statusCode = response.code();
+            String responseBody = response.body() != null ? response.body().string() : "";
+
+            logger.debug("Response code: {}", statusCode);
+            logger.debug("Response body: {}", responseBody);
+
+            if (!response.isSuccessful()) {
+                handleErrorResponse(response, responseBody);
+            }
+
+            return new RawResponse(statusCode, responseBody);
+        } catch (IOException e) {
+            throw new CodaException("Failed to execute request: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -243,6 +294,29 @@ public class CodaConnection {
                 .header("Content-Type", "application/json")
                 .build();
             return chain.proceed(authenticated);
+        }
+    }
+
+    /**
+     * Simple class to hold raw HTTP response details.
+     * Used when you need access to the raw status code and response body
+     * without automatic deserialization, such as for webhook responses.
+     */
+    public static class RawResponse {
+        private final int statusCode;
+        private final String responseBody;
+
+        public RawResponse(int statusCode, String responseBody) {
+            this.statusCode = statusCode;
+            this.responseBody = responseBody;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        public String getResponseBody() {
+            return responseBody;
         }
     }
 }
