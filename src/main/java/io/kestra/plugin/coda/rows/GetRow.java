@@ -2,7 +2,6 @@ package io.kestra.plugin.coda.rows;
 
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
@@ -28,7 +27,7 @@ import jakarta.validation.constraints.NotNull;
  */
 @SuperBuilder
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @NoArgsConstructor
 @Schema(
@@ -91,16 +90,14 @@ public class GetRow extends CodaTask implements RunnableTask<GetRow.Output> {
         title = "Use Column Names",
         description = "If true, return column values keyed by column name instead of column ID. Default is false."
     )
-    @PluginProperty
     @Builder.Default
-    private Boolean useColumnNames = false;
+    private Property<Boolean> useColumnNames = Property.of(false);
 
     @Schema(
         title = "Value Format",
         description = "The format for cell values. Options: 'simple' (default), 'simpleWithArrays', or 'rich'. " +
             "Use 'rich' to include formatted values and metadata."
     )
-    @PluginProperty
     @Builder.Default
     private Property<String> valueFormat = Property.of("simple");
 
@@ -111,6 +108,8 @@ public class GetRow extends CodaTask implements RunnableTask<GetRow.Output> {
         String tableIdValue = runContext.render(tableId).as(String.class).orElseThrow();
         String rowIdValue = runContext.render(rowId).as(String.class).orElseThrow();
         CodaConnection connection = createConnection(runContext);
+
+        Boolean rUseColumnNames = runContext.render(useColumnNames).as(Boolean.class).orElse(false);
 
         logger.info("Getting row {} from table {} in document {}",
             rowIdValue, tableIdValue, docId);
@@ -123,7 +122,7 @@ public class GetRow extends CodaTask implements RunnableTask<GetRow.Output> {
         // Add query parameters
         boolean hasQueryParams = false;
 
-        if (useColumnNames) {
+        if (rUseColumnNames) {
             endpointBuilder.append("?useColumnNames=true");
             hasQueryParams = true;
         }
