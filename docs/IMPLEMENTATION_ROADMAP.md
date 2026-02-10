@@ -2,13 +2,13 @@
 
 This document outlines the recommended approach for implementing Coda plugin features in Kestra.
 
-## Phase 1: Foundation (Core Infrastructure)
+## Phase 1: Foundation (Core Infrastructure) ✅ COMPLETED
 
 ### 1.1 Authentication & Configuration
-- [ ] Create `CodaConnection` class for managing API credentials
-- [ ] Implement secure API token storage using Kestra's secret management
-- [ ] Add connection validation task
-- [ ] Create base HTTP client with proper headers and authentication
+- [x] Create `CodaConnection` class for managing API credentials
+- [x] Implement secure API token storage using Kestra's secret management
+- [x] Add connection validation task
+- [x] Create base HTTP client with proper headers and authentication
 
 **Dependencies:**
 - OkHttp or similar HTTP client library
@@ -38,29 +38,31 @@ public abstract class CodaTask extends Task {
 ```
 
 ### 1.2 Common Models & DTOs
-- [ ] Create response models (Table, Column, Row, etc.)
-- [ ] Create request models (InsertRowRequest, UpsertRowRequest, etc.)
-- [ ] Implement pagination handling
-- [ ] Add error handling and exception classes
+- [x] Create response models (Table, Column, Row, etc.)
+- [x] Create request models (InsertRowRequest, UpsertRowRequest, etc.)
+- [x] Implement pagination handling
+- [x] Add error handling and exception classes
 
 **Key Models:**
-- `CodaTable`
-- `CodaColumn`
-- `CodaRow`
-- `CodaCell`
-- `PagedResponse<T>`
+- `CodaTable` ✅
+- `CodaColumn` ✅
+- `CodaRow` ✅
+- `CodaRowCell` ✅
+- `PagedResponse<T>` ✅
 
 ---
 
-## Phase 2: Read Operations (Discovery & Retrieval)
+## Phase 2: Read Operations (Discovery & Retrieval) ✅ COMPLETED
 
 ### 2.1 Table Operations
-- [ ] `ListTables` - List all tables in a document
+- [x] `ListTables` - List all tables in a document
   - Input: docId
   - Output: List of tables with metadata
-- [ ] `GetTable` - Get details of a specific table
+  - ✅ Implemented with pagination support (fetchAllPages option)
+- [x] `GetTable` - Get details of a specific table
   - Input: docId, tableId
   - Output: Table metadata
+  - ✅ Implemented at `src/main/java/io/kestra/plugin/coda/tables/GetTable.java`
 
 **Task Example:**
 ```java
@@ -89,26 +91,35 @@ public class ListTables extends CodaTask implements RunnableTask<ListTables.Outp
 ```
 
 ### 2.2 Column Operations
-- [ ] `ListColumns` - List all columns in a table
+- [x] `ListColumns` - List all columns in a table
   - Input: docId, tableId
   - Output: List of columns with types and metadata
-- [ ] `GetColumn` - Get details of a specific column
+  - ✅ Implemented with pagination support
+- [x] `GetColumn` - Get details of a specific column
   - Input: docId, tableId, columnId
   - Output: Column metadata
+  - ✅ Implemented at `src/main/java/io/kestra/plugin/coda/columns/GetColumn.java`
 
 ### 2.3 Row Operations
-- [ ] `ListRows` - List rows in a table with pagination
+- [x] `ListRows` - List rows in a table with pagination
   - Input: docId, tableId, optional filters
   - Output: List of rows with values
-- [ ] `GetRow` - Get a specific row
+  - ✅ Implemented with advanced features:
+    - Automatic pagination (fetchAllPages)
+    - Column names vs IDs (useColumnNames)
+    - Value format options (simple, simpleWithArrays, rich)
+    - Visible rows filtering (visibleOnly)
+    - Sorting support (sortBy)
+- [x] `GetRow` - Get a specific row
   - Input: docId, tableId, rowId
   - Output: Row data
+  - ✅ Implemented at `src/main/java/io/kestra/plugin/coda/rows/GetRow.java`
 
-**Advanced Options:**
-- Support for `limit`, `pageToken` parameters
-- Filter by column values (if API supports)
-- Sort by column
-- Return only visible rows option
+**Advanced Options:** ✅ ALL IMPLEMENTED
+- [x] Support for `limit`, `pageToken` parameters
+- [x] Filter by column values (visibleOnly)
+- [x] Sort by column (sortBy parameter)
+- [x] Return only visible rows option (visibleOnly)
 
 ---
 
@@ -339,21 +350,24 @@ dependencies {
 
 ## Implementation Checklist
 
-### Phase 1: Foundation
-- [ ] Set up project structure
-- [ ] Add dependencies
-- [ ] Create base classes and interfaces
-- [ ] Implement authentication
-- [ ] Create common models
-- [ ] Set up logging
+### Phase 1: Foundation ✅ COMPLETED
+- [x] Set up project structure
+- [x] Add dependencies
+- [x] Create base classes and interfaces
+- [x] Implement authentication
+- [x] Create common models
+- [x] Set up logging
 
-### Phase 2: Read Operations
-- [ ] Implement ListTables
-- [ ] Implement ListColumns
-- [ ] Implement ListRows
-- [ ] Add pagination support
-- [ ] Create unit tests
-- [ ] Write documentation
+### Phase 2: Read Operations ✅ COMPLETED
+- [x] Implement ListTables
+- [x] Implement GetTable
+- [x] Implement ListColumns
+- [x] Implement GetColumn
+- [x] Implement ListRows
+- [x] Implement GetRow
+- [x] Add pagination support
+- [x] Create unit tests
+- [x] Write documentation
 
 ### Phase 3: Write Operations
 - [ ] Implement InsertRow/InsertRows
