@@ -1,30 +1,24 @@
 package io.kestra.plugin.coda.tables;
 
-import io.kestra.core.models.property.Property;
-import io.kestra.core.runners.RunContext;
-import io.kestra.core.runners.RunContextFactory;
-import io.kestra.core.junit.annotations.KestraTest;
+import io.kestra.plugin.coda.CodaTestBase;
+import io.kestra.plugin.coda.models.CodaTable;
+import io.kestra.plugin.coda.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
-import jakarta.inject.Inject;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@KestraTest
-class ListTablesTest {
-    @Inject
-    private RunContextFactory runContextFactory;
+class ListTablesTest extends CodaTestBase {
 
     @Test
-    @Disabled("Integration test - requires valid Coda API token and document ID")
-    void testListTables() throws Exception {
-        RunContext runContext = runContextFactory.of();
+    void testListTables_Integration() throws Exception {
+        requireIntegrationTest();
 
         ListTables task = ListTables.builder()
-            .apiToken(Property.of("YOUR_API_TOKEN"))
-            .docId(Property.of("YOUR_DOC_ID"))
+            .apiToken(getApiToken())
+            .docId(getDocId())
             .build();
 
         ListTables.Output output = task.run(runContext);
@@ -35,20 +29,56 @@ class ListTablesTest {
     }
 
     @Test
-    @Disabled("Integration test - requires valid Coda API token and document ID")
-    void testListTablesWithPagination() throws Exception {
-        RunContext runContext = runContextFactory.of();
+    void testListTables_WithPagination_Integration() throws Exception {
+        requireIntegrationTest();
 
         ListTables task = ListTables.builder()
-            .apiToken(Property.of("YOUR_API_TOKEN"))
-            .docId(Property.of("YOUR_DOC_ID"))
-            .fetchAllPages(true)
-            .limit(10)
+            .apiToken(getApiToken())
+            .docId(getDocId())
+            .fetchAllPages(property(true))
+            .limit(property(10))
             .build();
 
         ListTables.Output output = task.run(runContext);
 
         assertThat(output.getTables(), is(notNullValue()));
         assertThat(output.getTotalCount(), is(greaterThanOrEqualTo(0)));
+    }
+
+    @Test
+    void testListTables_OutputStructure() {
+        // Test output structure without API calls
+        List<CodaTable> mockTables = TestDataFactory.createTables(5);
+
+        ListTables.Output output = ListTables.Output.builder()
+            .tables(mockTables)
+            .totalCount(5)
+            .pageCount(1)
+            .build();
+
+        assertThat(output.getTables(), hasSize(5));
+        assertThat(output.getTotalCount(), is(5));
+        assertThat(output.getPageCount(), is(1));
+
+        // Verify first table structure
+        CodaTable firstTable = output.getTables().get(0);
+        assertThat(firstTable.getId(), is(notNullValue()));
+        assertThat(firstTable.getName(), is(notNullValue()));
+        assertThat(firstTable.getType(), is(notNullValue()));
+    }
+
+    @Test
+    void testListTables_EmptyResults() {
+        // Test with empty results
+        List<CodaTable> emptyTables = List.of();
+
+        ListTables.Output output = ListTables.Output.builder()
+            .tables(emptyTables)
+            .totalCount(0)
+            .pageCount(1)
+            .build();
+
+        assertThat(output.getTables(), is(empty()));
+        assertThat(output.getTotalCount(), is(0));
     }
 }
