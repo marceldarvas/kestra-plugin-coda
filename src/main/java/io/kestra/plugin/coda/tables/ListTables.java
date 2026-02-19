@@ -8,7 +8,6 @@ import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.plugin.coda.CodaTask;
 import io.kestra.plugin.coda.client.CodaConnection;
-import io.kestra.plugin.coda.exceptions.CodaException;
 import io.kestra.plugin.coda.models.CodaTable;
 import io.kestra.plugin.coda.models.PagedResponse;
 import io.swagger.v3.oas.annotations.media.Schema;

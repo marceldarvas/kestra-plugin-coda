@@ -24,10 +24,11 @@ The plugin uses a multi-layered testing approach:
 - **Dependencies**: None (mocked)
 
 ### 2. Integration Tests
-- **Location**: Same test files, annotated with `@Tag("integration")`
+- **Location**: Same test files, guarded by `requireIntegrationTest()` (JUnit assumptions)
 - **Purpose**: Test against real Coda API
-- **Execution**: Requires API credentials
+- **Execution**: Requires API credentials via environment variables
 - **Dependencies**: Valid Coda API token and test document
+- **Behavior**: Automatically **skip** (not fail) when environment variables are not set
 
 ### Test Organization
 ```

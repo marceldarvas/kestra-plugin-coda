@@ -18,6 +18,8 @@ import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
 
 import jakarta.validation.constraints.NotNull;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Get a specific row from a Coda table.
@@ -128,10 +130,11 @@ public class GetRow extends CodaTask implements RunnableTask<GetRow.Output> {
         }
 
         String valueFormatValue = runContext.render(valueFormat).as(String.class).orElse("simple");
+        String encodedValueFormat = URLEncoder.encode(valueFormatValue, StandardCharsets.UTF_8);
         if (hasQueryParams) {
-            endpointBuilder.append("&valueFormat=").append(valueFormatValue);
+            endpointBuilder.append("&valueFormat=").append(encodedValueFormat);
         } else {
-            endpointBuilder.append("?valueFormat=").append(valueFormatValue);
+            endpointBuilder.append("?valueFormat=").append(encodedValueFormat);
         }
 
         String endpoint = endpointBuilder.toString();

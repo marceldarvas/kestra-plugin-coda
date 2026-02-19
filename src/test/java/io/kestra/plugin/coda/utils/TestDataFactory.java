@@ -122,41 +122,47 @@ public class TestDataFactory {
 
     /**
      * Create an InsertRowsRequest.
+     *
+     * Each map entry in the list represents a row, where keys are column IDs/names
+     * and values are the cell values.
      */
     public static InsertRowsRequest createInsertRowsRequest(List<Map<String, Object>> rows) {
-        List<CodaRowCell> rowCells = new ArrayList<>();
+        List<InsertRowsRequest.RowData> rowDataList = new ArrayList<>();
         for (Map<String, Object> row : rows) {
-            List<CodaRowCell.Cell> cells = new ArrayList<>();
+            List<CodaRowCell> cells = new ArrayList<>();
             for (Map.Entry<String, Object> entry : row.entrySet()) {
-                cells.add(CodaRowCell.Cell.builder()
+                cells.add(CodaRowCell.builder()
                     .column(entry.getKey())
                     .value(entry.getValue())
                     .build());
             }
-            rowCells.add(CodaRowCell.builder()
+            rowDataList.add(InsertRowsRequest.RowData.builder()
                 .cells(cells)
                 .build());
         }
 
         return InsertRowsRequest.builder()
-            .rows(rowCells)
+            .rows(rowDataList)
             .build();
     }
 
     /**
      * Create an UpdateRowRequest.
+     *
+     * The map entries represent cell updates, where keys are column IDs/names
+     * and values are the new cell values.
      */
     public static UpdateRowRequest createUpdateRowRequest(Map<String, Object> values) {
-        List<CodaRowCell.Cell> cells = new ArrayList<>();
+        List<CodaRowCell> cells = new ArrayList<>();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
-            cells.add(CodaRowCell.Cell.builder()
+            cells.add(CodaRowCell.builder()
                 .column(entry.getKey())
                 .value(entry.getValue())
                 .build());
         }
 
         return UpdateRowRequest.builder()
-            .row(CodaRowCell.builder()
+            .row(UpdateRowRequest.RowData.builder()
                 .cells(cells)
                 .build())
             .build();

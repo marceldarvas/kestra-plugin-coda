@@ -20,6 +20,8 @@ import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
 
 import jakarta.validation.constraints.NotNull;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,7 +159,7 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
         }
 
         String valueFormatValue = runContext.render(valueFormat).as(String.class).orElse("simple");
-        endpointBuilder.append("&valueFormat=").append(valueFormatValue);
+        endpointBuilder.append("&valueFormat=").append(URLEncoder.encode(valueFormatValue, StandardCharsets.UTF_8));
 
         if (rVisibleOnly) {
             endpointBuilder.append("&visibleOnly=true");
@@ -166,7 +168,7 @@ public class ListRows extends CodaTask implements RunnableTask<ListRows.Output> 
         if (sortBy != null) {
             String sortByValue = runContext.render(sortBy).as(String.class).orElse(null);
             if (sortByValue != null && !sortByValue.isEmpty()) {
-                endpointBuilder.append("&sortBy=").append(sortByValue);
+                endpointBuilder.append("&sortBy=").append(URLEncoder.encode(sortByValue, StandardCharsets.UTF_8));
             }
         }
 

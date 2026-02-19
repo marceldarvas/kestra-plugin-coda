@@ -45,7 +45,7 @@ class GetRowTest {
             .docId(Property.of("YOUR_DOC_ID"))
             .tableId(Property.of("YOUR_TABLE_ID"))
             .rowId(Property.of("YOUR_ROW_ID"))
-            .useColumnNames(true)
+            .useColumnNames(Property.of(true))
             .valueFormat(Property.of("rich"))
             .build();
 

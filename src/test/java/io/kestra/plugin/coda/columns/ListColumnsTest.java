@@ -44,8 +44,8 @@ class ListColumnsTest {
             .apiToken(Property.of("YOUR_API_TOKEN"))
             .docId(Property.of("YOUR_DOC_ID"))
             .tableId(Property.of("YOUR_TABLE_ID"))
-            .fetchAllPages(true)
-            .limit(10)
+            .fetchAllPages(Property.of(true))
+            .limit(Property.of(10))
             .build();
 
         ListColumns.Output output = task.run(runContext);
