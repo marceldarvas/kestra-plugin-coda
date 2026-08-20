@@ -1,6 +1,6 @@
 @PluginSubGroup(
-    title = "Example plugin",
-    description = "A plugin to show how to build a plugin in Kestra.",
+    title = "Coda",
+    description = "Kestra plugin for Coda. Currently ships the template Example task; real Coda API tasks TBD.",
     categories = PluginSubGroup.PluginCategory.TOOL
 )
 package io.kestra.plugin.templates;
