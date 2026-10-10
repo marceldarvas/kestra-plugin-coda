@@ -131,8 +131,12 @@ tasks:
 
 ## Running the project locally
 
+### Compatibility
+- Built against Kestra **2.0** (`kestraVersion=2.0.5` in `gradle.properties`); targets Kestra 2.0.x servers.
+- The local dev image (`Dockerfile`) is pinned to `kestra/kestra:v2.0`.
+
 ### Prerequisites
-- Java 21
+- Java 25 (required by Kestra 2.0)
 - Docker
 
 ### Running tests

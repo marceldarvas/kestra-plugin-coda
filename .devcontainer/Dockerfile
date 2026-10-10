@@ -37,18 +37,15 @@ ARG OS_ARCHITECTURE
 RUN mkdir -p /usr/java
 RUN echo "Building on platform: $BUILDPLATFORM"
 RUN case "$BUILDPLATFORM" in \
-  "linux/amd64") OS_ARCHITECTURE="x64_linux" ;; \
-  "linux/arm64") OS_ARCHITECTURE="aarch64_linux" ;; \
-  "darwin/amd64") OS_ARCHITECTURE="x64_mac" ;; \
-  "darwin/arm64") OS_ARCHITECTURE="aarch64_mac" ;; \
+  "linux/amd64"|"darwin/amd64") OS_ARCHITECTURE="x64" ;; \
+  "linux/arm64"|"darwin/arm64") OS_ARCHITECTURE="aarch64" ;; \
   *) echo "Unsupported BUILDPLATFORM: $BUILDPLATFORM" && exit 1 ;; \
   esac && \
-  wget "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_${OS_ARCHITECTURE}_hotspot_21.0.7_6.tar.gz" && \
-  mv OpenJDK21U-jdk_${OS_ARCHITECTURE}_hotspot_21.0.7_6.tar.gz openjdk-21.0.7.tar.gz
-RUN tar -xzvf openjdk-21.0.7.tar.gz && \
-  mv jdk-21.0.7+6 jdk-21 && \
-  mv jdk-21 /usr/java/
-ENV JAVA_HOME=/usr/java/jdk-21
+  wget -O openjdk-25.tar.gz "https://api.adoptium.net/v3/binary/latest/25/ga/linux/${OS_ARCHITECTURE}/jdk/hotspot/normal/eclipse"
+RUN mkdir -p /usr/java/jdk-25 && \
+  tar -xzvf openjdk-25.tar.gz --strip-components=1 -C /usr/java/jdk-25 && \
+  rm openjdk-25.tar.gz
+ENV JAVA_HOME=/usr/java/jdk-25
 ENV PATH="$PATH:$JAVA_HOME/bin"
 # Will load a custom configuration file for Micronaut
 ENV MICRONAUT_ENVIRONMENTS=local,override

@@ -4,7 +4,7 @@ This guide will help you get started with developing the Kestra Coda plugin quic
 
 ## Prerequisites
 
-- Java 21 or higher
+- Java 25 or higher (required by Kestra 2.0)
 - Gradle (included via wrapper)
 - Docker (for local Kestra development)
 - A Coda account with API access
@@ -23,7 +23,7 @@ cd kestra-plugin-coda
 
 ```bash
 java -version
-# Should show Java 21 or higher
+# Should show Java 25 or higher
 ```
 
 ### Run Tests
@@ -256,8 +256,8 @@ class ListTablesTest {
         RunContext runContext = runContextFactory.of();
         
         ListTables task = ListTables.builder()
-            .apiToken(Property.of(apiToken))
-            .docId(Property.of(docId))
+            .apiToken(Property.ofValue(apiToken))
+            .docId(Property.ofValue(docId))
             .build();
         
         ListTables.Output output = task.run(runContext);
