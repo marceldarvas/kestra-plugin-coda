@@ -3,7 +3,6 @@ package io.kestra.plugin.templates;
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.conditions.ConditionContext;
-import io.kestra.core.models.executions.Execution;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.triggers.*;
 import io.kestra.core.runners.RunContext;
@@ -32,7 +31,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     protected Property<Double> min = Property.ofValue(0.5);
 
     @Override
-    public Optional<Execution> evaluate(ConditionContext conditionContext, TriggerContext context) throws IllegalVariableEvaluationException {
+    public Optional<TriggerEvaluationResult> eval(ConditionContext conditionContext, TriggerContext context) throws IllegalVariableEvaluationException {
         RunContext runContext = conditionContext.getRunContext();
 
         double random = Math.random();
@@ -41,14 +40,13 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
         }
 
         runContext.logger().info("Will create an execution");
-        Execution execution = TriggerService.generateExecution(
+        TriggerEvaluationResult result = TriggerService.generateEvaluationResult(
             this,
             conditionContext,
-            context,
             Output.builder().random(random).build()
         );
 
-        return Optional.of(execution);
+        return Optional.of(result);
     }
 
     @Builder
