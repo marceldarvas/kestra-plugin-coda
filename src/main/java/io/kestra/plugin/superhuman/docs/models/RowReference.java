@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CodaRowReference {
+public class RowReference {
     @Schema(
         title = "Row ID",
         description = "The ID of the referenced row"

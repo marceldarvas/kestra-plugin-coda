@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,7 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 import java.util.List;
 
 /**
- * Request body for updating a row in a Coda table.
+ * Request body for updating a row in a Superhuman Docs table.
  */
 @Builder
 @Getter
@@ -39,6 +39,6 @@ public class UpdateRowRequest {
         )
         @JsonProperty("cells")
         @Singular
-        private List<CodaRowCell> cells;
+        private List<RowCell> cells;
     }
 }

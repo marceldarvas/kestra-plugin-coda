@@ -1,8 +1,8 @@
-package io.kestra.plugin.coda.client;
+package io.kestra.plugin.superhuman.docs.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.kestra.plugin.coda.exceptions.*;
+import io.kestra.plugin.superhuman.docs.exceptions.*;
 import okhttp3.*;
 import org.slf4j.Logger;
 
@@ -10,23 +10,41 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages HTTP connections and communication with the Coda API.
+ * Manages HTTP connections and communication with the Superhuman Docs API.
  */
-public class CodaConnection {
-    private static final String BASE_URL = "https://coda.io/apis/v1";
+public class SuperhumanDocsConnection {
+    /**
+     * Base URL of the Superhuman Docs (formerly Coda) REST API.
+     * <p>
+     * Coda was renamed to Superhuman Docs on 2026-07-08, but the official API reference
+     * (https://docs.superhuman.com/developers/apis/v1, "Superhuman Docs API 1.6.0") still documents this base path,
+     * and Superhuman's help center states that existing endpoints such as https://coda.io/apis/v1/docs
+     * continue to work without changes.
+     */
+    static final String DEFAULT_BASE_URL = "https://coda.io/apis/v1";
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
+    private final String baseUrl;
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
     private final Logger logger;
 
     /**
-     * Creates a new Coda API connection.
+     * Creates a new Superhuman Docs API connection.
      *
-     * @param apiToken The Coda API token for authentication
+     * @param apiToken The Superhuman Docs API token for authentication
      * @param logger Logger instance for logging
      */
-    public CodaConnection(String apiToken, Logger logger) {
+    public SuperhumanDocsConnection(String apiToken, Logger logger) {
+        this(apiToken, logger, DEFAULT_BASE_URL);
+    }
+
+    /**
+     * Creates a connection against a custom base URL. Package-private: only used by tests to point the client
+     * at a mock server.
+     */
+    SuperhumanDocsConnection(String apiToken, Logger logger, String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         this.logger = logger;
         this.objectMapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
@@ -40,14 +58,14 @@ public class CodaConnection {
     }
 
     /**
-     * Executes a GET request to the Coda API.
+     * Executes a GET request to the Superhuman Docs API.
      *
      * @param endpoint The API endpoint (relative to base URL)
      * @param responseType The class type to deserialize the response to
      * @return The deserialized response
-     * @throws CodaException if the request fails
+     * @throws SuperhumanDocsException if the request fails
      */
-    public <T> T get(String endpoint, Class<T> responseType) throws CodaException {
+    public <T> T get(String endpoint, Class<T> responseType) throws SuperhumanDocsException {
         String url = buildUrl(endpoint);
         Request request = new Request.Builder()
             .url(url)
@@ -58,21 +76,21 @@ public class CodaConnection {
     }
 
     /**
-     * Executes a POST request to the Coda API.
+     * Executes a POST request to the Superhuman Docs API.
      *
      * @param endpoint The API endpoint (relative to base URL)
      * @param requestBody The request body object
      * @param responseType The class type to deserialize the response to
      * @return The deserialized response
-     * @throws CodaException if the request fails
+     * @throws SuperhumanDocsException if the request fails
      */
-    public <T> T post(String endpoint, Object requestBody, Class<T> responseType) throws CodaException {
+    public <T> T post(String endpoint, Object requestBody, Class<T> responseType) throws SuperhumanDocsException {
         String url = buildUrl(endpoint);
         String json;
         try {
             json = objectMapper.writeValueAsString(requestBody);
         } catch (Exception e) {
-            throw new CodaException("Failed to serialize request body: " + e.getMessage(), e);
+            throw new SuperhumanDocsException("Failed to serialize request body: " + e.getMessage(), e);
         }
 
         logger.debug("POST {} with body: {}", url, json);
@@ -87,21 +105,21 @@ public class CodaConnection {
     }
 
     /**
-     * Executes a PUT request to the Coda API.
+     * Executes a PUT request to the Superhuman Docs API.
      *
      * @param endpoint The API endpoint (relative to base URL)
      * @param requestBody The request body object
      * @param responseType The class type to deserialize the response to
      * @return The deserialized response
-     * @throws CodaException if the request fails
+     * @throws SuperhumanDocsException if the request fails
      */
-    public <T> T put(String endpoint, Object requestBody, Class<T> responseType) throws CodaException {
+    public <T> T put(String endpoint, Object requestBody, Class<T> responseType) throws SuperhumanDocsException {
         String url = buildUrl(endpoint);
         String json;
         try {
             json = objectMapper.writeValueAsString(requestBody);
         } catch (Exception e) {
-            throw new CodaException("Failed to serialize request body: " + e.getMessage(), e);
+            throw new SuperhumanDocsException("Failed to serialize request body: " + e.getMessage(), e);
         }
 
         logger.debug("PUT {} with body: {}", url, json);
@@ -116,14 +134,14 @@ public class CodaConnection {
     }
 
     /**
-     * Executes a DELETE request to the Coda API.
+     * Executes a DELETE request to the Superhuman Docs API.
      *
      * @param endpoint The API endpoint (relative to base URL)
      * @param responseType The class type to deserialize the response to
      * @return The deserialized response
-     * @throws CodaException if the request fails
+     * @throws SuperhumanDocsException if the request fails
      */
-    public <T> T delete(String endpoint, Class<T> responseType) throws CodaException {
+    public <T> T delete(String endpoint, Class<T> responseType) throws SuperhumanDocsException {
         String url = buildUrl(endpoint);
         Request request = new Request.Builder()
             .url(url)
@@ -136,7 +154,7 @@ public class CodaConnection {
     /**
      * Executes an HTTP request and handles the response.
      */
-    private <T> T executeRequest(Request request, Class<T> responseType) throws CodaException {
+    private <T> T executeRequest(Request request, Class<T> responseType) throws SuperhumanDocsException {
         try (Response response = client.newCall(request).execute()) {
             String responseBody = response.body() != null ? response.body().string() : "";
 
@@ -153,21 +171,21 @@ public class CodaConnection {
 
             return objectMapper.readValue(responseBody, responseType);
         } catch (IOException e) {
-            throw new CodaException("Failed to execute request: " + e.getMessage(), e);
+            throw new SuperhumanDocsException("Failed to execute request: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Handles error responses from the Coda API.
+     * Handles error responses from the Superhuman Docs API.
      */
-    private void handleErrorResponse(Response response, String responseBody) throws CodaException {
+    private void handleErrorResponse(Response response, String responseBody) throws SuperhumanDocsException {
         int statusCode = response.code();
 
         switch (statusCode) {
             case 401:
-                throw new CodaAuthenticationException("Authentication failed. Please check your API token.");
+                throw new SuperhumanDocsAuthenticationException("Authentication failed. Please check your API token.");
             case 404:
-                throw new CodaResourceNotFoundException("Resource not found: " + response.request().url());
+                throw new SuperhumanDocsResourceNotFoundException("Resource not found: " + response.request().url());
             case 429:
                 String retryAfter = response.header("Retry-After");
                 Integer retrySeconds = null;
@@ -178,10 +196,10 @@ public class CodaConnection {
                         logger.warn("Invalid Retry-After header value: {}", retryAfter);
                     }
                 }
-                throw new CodaRateLimitException("Rate limit exceeded", retrySeconds);
+                throw new SuperhumanDocsRateLimitException("Rate limit exceeded", retrySeconds);
             default:
                 String message = String.format("Request failed with status %d: %s", statusCode, responseBody);
-                throw new CodaException(message, statusCode);
+                throw new SuperhumanDocsException(message, statusCode);
         }
     }
 
@@ -194,7 +212,7 @@ public class CodaConnection {
         }
 
         String cleanEndpoint = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
-        return BASE_URL + cleanEndpoint;
+        return baseUrl + cleanEndpoint;
     }
 
     /**

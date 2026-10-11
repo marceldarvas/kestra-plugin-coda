@@ -1,4 +1,4 @@
-# Coda Plugin Developer Guide
+# Superhuman Docs Plugin Developer Guide
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -17,7 +17,7 @@
 
 ## Overview
 
-The Coda API is a RESTful API that allows programmatic interaction with Coda documents. This guide covers the essential features for developing a Kestra plugin for Coda, including:
+The Superhuman Docs (formerly Coda) API is a RESTful API that allows programmatic interaction with Superhuman Docs documents. This guide covers the essential features for developing a Kestra plugin for Superhuman Docs, including:
 - **Tables & Columns**: Discovering and managing table schemas
 - **Row Operations**: Reading, inserting, updating, upserting, and deleting rows
 - **Automations**: Triggering automations via webhooks
@@ -28,13 +28,17 @@ The Coda API is a RESTful API that allows programmatic interaction with Coda doc
 https://coda.io/apis/v1/
 ```
 
+The base path is unchanged by the rename: the official reference
+([Superhuman Docs API 1.6.0](https://docs.superhuman.com/developers/apis/v1)) still documents `https://coda.io/apis/v1`,
+and Superhuman states that existing coda.io API endpoints keep working.
+
 ---
 
 ## Authentication
 
 ### Getting an API Key
-1. Sign in to your Coda account
-2. Navigate to Account Settings → Developer/API Settings
+1. Sign in to your Superhuman Docs account
+2. Open your Superhuman Docs account settings and find the API settings
 3. Generate a new API token
 4. Store the token securely (treat it like a password)
 
@@ -64,7 +68,7 @@ Request request = new Request.Builder()
 ## Core Concepts
 
 ### Resource Identifiers
-- **Doc ID**: Unique identifier for a Coda document
+- **Doc ID**: Unique identifier for a Superhuman Docs document
 - **Table ID**: Unique identifier for a table (use IDs instead of names for reliability)
 - **Column ID**: Unique identifier for a column (immutable, unlike column names)
 - **Row ID**: Unique identifier for a row
@@ -164,7 +168,7 @@ curl -X GET "https://coda.io/apis/v1/docs/{docId}/tables/{tableId}/columns" \
 - `date`, `time`, `dateTime`: Date/time values
 - `select`: Select list (single choice)
 - `multiSelect`: Multiple choice
-- `people`: Coda user references
+- `people`: Superhuman Docs user references
 - `lookup`: References to other tables
 - `button`: Action buttons
 - `image`, `file`: File attachments
@@ -376,7 +380,7 @@ curl -X DELETE "https://coda.io/apis/v1/docs/{docId}/tables/{tableId}/rows/{rowI
 
 ### Current API Limitations
 
-**Important:** As of the current API version, **comments are NOT natively exposed via the Coda API**. This means:
+**Important:** As of the current API version, **comments are NOT natively exposed via the Superhuman Docs API**. This means:
 
 - ❌ Cannot retrieve comments via API
 - ❌ Cannot search or filter by comments
@@ -386,33 +390,33 @@ curl -X DELETE "https://coda.io/apis/v1/docs/{docId}/tables/{tableId}/rows/{rowI
 ### Workarounds
 
 1. **Use a Custom Text Column**: Create a dedicated column for notes/comments that can be read/written via API
-2. **Coda Packs**: Build a custom Pack with internal APIs (advanced)
+2. **Superhuman Docs Packs**: Build a custom Pack with internal APIs (advanced)
 3. **Integration Tools**: Use third-party tools like Zapier or Make.com with limited comment capabilities
 4. **Activity Logs**: Track changes in a separate table as a comment alternative
 
 ### Community Requests
-The Coda community has requested native comment API support. Monitor the [Coda Feature Requests](https://community.coda.io/) for updates.
+The Superhuman Docs community has requested native comment API support. Monitor the [Coda community forum](https://community.coda.io/) (legacy Coda link) for updates.
 
 ---
 
 ## Automations & Webhooks
 
 ### Overview
-Coda automations can be triggered via webhooks, allowing external applications to invoke actions in your Coda doc.
+Superhuman Docs automations can be triggered via webhooks, allowing external applications to invoke actions in your Superhuman Docs doc.
 
 ### Setting Up Webhook-Triggered Automations
 
-**In Coda:**
-1. Open your Coda document
+**In Superhuman Docs:**
+1. Open your Superhuman Docs document
 2. Click the three-dot menu (⋮) → "Doc settings"
 3. Navigate to "Automations" → "+ Add rule"
 4. For the **When** condition, select "Webhook invoked"
-5. Coda generates a unique webhook URL
+5. Superhuman Docs generates a unique webhook URL
 6. Define the **Then** actions (e.g., add row, update table, send notification)
 
 **Authentication:**
 - Webhook endpoints require Bearer token authentication
-- Use your Coda API token in the Authorization header
+- Use your Superhuman Docs API token in the Authorization header
 
 ### Triggering Automations Programmatically
 
@@ -448,7 +452,7 @@ Response response = client.newCall(request).execute();
 
 ### Accessing Webhook Data in Automations
 
-In your Coda automation:
+In your Superhuman Docs automation:
 - The webhook payload is available as **"Step 1 Result"**
 - Use `ParseJSON([Step 1 Result], "key")` to extract values
 - Example: `ParseJSON([Step 1 Result], "name")` returns "John Doe"
@@ -463,7 +467,7 @@ In your Coda automation:
 }
 ```
 
-In Coda automation, iterate over `ParseJSON([Step 1 Result], "items")` using ForEach.
+In Superhuman Docs automation, iterate over `ParseJSON([Step 1 Result], "items")` using ForEach.
 
 ### Automation Triggers
 
@@ -496,12 +500,12 @@ import okhttp3.*;
 import com.google.gson.Gson;
 import java.io.IOException;
 
-public class CodaClient {
+public class SuperhumanDocsClient {
     private final String apiToken;
     private final OkHttpClient client;
     private final Gson gson;
     
-    public CodaClient(String apiToken) {
+    public SuperhumanDocsClient(String apiToken) {
         this.apiToken = apiToken;
         this.client = new OkHttpClient();
         this.gson = new Gson();
@@ -551,12 +555,12 @@ public class CodaClient {
 ### Java Example: Insert Rows
 
 ```java
-public class CodaRowOperations {
+public class SuperhumanDocsRowOperations {
     private final String apiToken;
     private final OkHttpClient client;
     private final Gson gson;
     
-    public CodaRowOperations(String apiToken) {
+    public SuperhumanDocsRowOperations(String apiToken) {
         this.apiToken = apiToken;
         this.client = new OkHttpClient();
         this.gson = new Gson();
@@ -804,19 +808,19 @@ logger.info("Successfully inserted {} rows in {}ms", rows.size(), duration);
 ## Resources
 
 ### Official Documentation
-- **Coda API Reference**: [https://coda.io/developers](https://coda.io/developers)
-- **Getting Started Guide**: [https://coda.io/@oleg/getting-started-guide-coda-api](https://coda.io/@oleg/getting-started-guide-coda-api)
-- **Automations Help**: [https://help.coda.io/hc/en-us/articles/39555778179853-Automations-in-Coda](https://help.coda.io/hc/en-us/articles/39555778179853-Automations-in-Coda)
-- **Webhook Automations**: [https://help.coda.io/hc/en-us/articles/39555972006541-Create-webhook-triggered-automations](https://help.coda.io/hc/en-us/articles/39555972006541-Create-webhook-triggered-automations)
-- **Tables and Views**: [https://help.coda.io/hc/en-us/categories/37412217582221-Tables-and-views](https://help.coda.io/hc/en-us/categories/37412217582221-Tables-and-views)
-- **Formula Reference**: [https://coda.io/formulas](https://coda.io/formulas)
+- **Superhuman Docs API Reference**: [https://docs.superhuman.com/developers/apis/v1](https://docs.superhuman.com/developers/apis/v1)
+- **Getting Started Guide** (legacy Coda link): [https://coda.io/@oleg/getting-started-guide-coda-api](https://coda.io/@oleg/getting-started-guide-coda-api)
+- **Automations Help** (legacy Coda link): [https://help.coda.io/hc/en-us/articles/39555778179853-Automations-in-Coda](https://help.coda.io/hc/en-us/articles/39555778179853-Automations-in-Coda)
+- **Webhook Automations** (legacy Coda link): [https://help.coda.io/hc/en-us/articles/39555972006541-Create-webhook-triggered-automations](https://help.coda.io/hc/en-us/articles/39555972006541-Create-webhook-triggered-automations)
+- **Tables and Views** (legacy Coda link): [https://help.coda.io/hc/en-us/categories/37412217582221-Tables-and-views](https://help.coda.io/hc/en-us/categories/37412217582221-Tables-and-views)
+- **Formula Reference** (legacy Coda link): [https://coda.io/formulas](https://coda.io/formulas)
 
 ### Testing Tools
 - **Postman Collection**: [Coda API Postman Collection](https://www.postman.com/codaio/coda-workspace/collection/0vy7uxn/coda-api)
 - Use Postman for rapid API testing and exploration
 
 ### Community Resources
-- **Coda Maker Community**: [https://community.coda.io/](https://community.coda.io/)
+- **Coda Maker Community** (legacy Coda link): [https://community.coda.io/](https://community.coda.io/)
 - Search for API discussions, feature requests, and community solutions
 - Report issues and request features
 
@@ -863,4 +867,4 @@ logger.info("Successfully inserted {} rows in {}ms", rows.size(), duration);
 
 **Last Updated**: 2024-11-18
 
-For questions or issues, please refer to the official Coda API documentation or the Coda Maker Community.
+For questions or issues, please refer to the official Superhuman Docs API documentation or the Coda Maker Community.

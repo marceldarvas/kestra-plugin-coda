@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +12,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Getter
 @Jacksonized
-public class CodaRowCell {
+public class RowCell {
     @Schema(
         title = "Column ID or Name",
         description = "The column identifier (can be column ID or name)"

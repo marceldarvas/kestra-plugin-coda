@@ -1,14 +1,14 @@
 plugins {
-    id "com.vanniktech.maven.publish" version "0.36.0"
-    id "io.kestra.gradle.inject-bom-versions" version "1.0.2"
+    id "com.vanniktech.maven.publish" version "0.37.0"
+    id "io.kestra.gradle.inject-bom-versions" version "1.2.11"
     id 'java-library'
     id "idea"
     id 'jacoco'
     id "com.adarshr.test-logger" version "4.0.0"
-    id "com.gradleup.shadow" version "9.4.0"
+    id "com.gradleup.shadow" version "9.6.1"
     id 'signing'
     id "com.github.ben-manes.versions" version "0.53.0"
-    id 'net.researchgate.release' version '3.1.0'
+    id 'net.researchgate.release' version '3.2.0'
 }
 
 def isBuildSnapshot = version.toString().endsWith("-SNAPSHOT")
@@ -21,7 +21,7 @@ repositories {
     }
 }
 
-final targetJavaVersion = JavaVersion.VERSION_21
+final targetJavaVersion = JavaVersion.VERSION_25
 
 java {
     sourceCompatibility = targetJavaVersion
@@ -29,7 +29,7 @@ java {
 }
 
 group = "io.kestra.plugin"
-description = 'Plugin template for Kestra'
+description = 'Read and write Superhuman Docs (formerly Coda) tables from Kestra'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
@@ -101,38 +101,16 @@ dependencies {
     testImplementation group: "io.kestra", name: "repository-memory", version: kestraVersion
     testImplementation group: "io.kestra", name: "runner-memory", version: kestraVersion
     testImplementation group: "io.kestra", name: "storage-local", version: kestraVersion
+    testImplementation group: "io.kestra", name: "indexer", version: kestraVersion
 
     // test
     testImplementation "org.junit.jupiter:junit-jupiter-engine"
     testImplementation "org.hamcrest:hamcrest"
     testImplementation "org.hamcrest:hamcrest-library"
 
-    // HTTP client mocking for tests
-    testImplementation 'com.squareup.okhttp3:mockwebserver:5.3.2'
+    // HTTP API mocking for tests (version managed by the Kestra platform BOM)
+    testImplementation "org.wiremock:wiremock-jetty12"
     testImplementation 'org.mockito:mockito-core:5.23.0'
-}
-
-/**********************************************************************************************************************\
- * Allure Reports
- **********************************************************************************************************************/
-dependencies {
-    testImplementation enforcedPlatform("io.kestra:platform:$kestraVersion")
-    testImplementation "io.qameta.allure:allure-junit5"
-}
-
-configurations {
-    agent {
-        canBeResolved = true
-        canBeConsumed = true
-    }
-}
-
-dependencies {
-    agent "org.aspectj:aspectjweaver:1.9.25.1"
-}
-
-test {
-    jvmArgs = [ "-javaagent:${configurations.agent.singleFile}" ]
 }
 
 /**********************************************************************************************************************\
@@ -189,8 +167,8 @@ jar {
     manifest {
         attributes(
                 "X-Kestra-Name": project.name,
-                "X-Kestra-Title": "Template",
-                "X-Kestra-Group": project.group + ".templates",
+                "X-Kestra-Title": "Superhuman Docs",
+                "X-Kestra-Group": project.group + ".superhuman.docs",
                 "X-Kestra-Description": project.description,
                 "X-Kestra-Version": project.version
         )

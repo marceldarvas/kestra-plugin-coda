@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,13 +8,13 @@ import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 /**
- * Represents a table in a Coda document.
+ * Represents a table in a Superhuman Docs document.
  */
 @Builder
 @Getter
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CodaTable {
+public class Table {
     @Schema(
         title = "Table ID",
         description = "The unique identifier for this table"

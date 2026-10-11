@@ -1,23 +1,23 @@
-package io.kestra.plugin.coda.exceptions;
+package io.kestra.plugin.superhuman.docs.exceptions;
 
 /**
- * Exception thrown when the Coda API rate limit is exceeded.
+ * Exception thrown when the Superhuman Docs API rate limit is exceeded.
  * Clients should implement retry logic with exponential backoff when this exception occurs.
  */
-public class CodaRateLimitException extends CodaException {
+public class SuperhumanDocsRateLimitException extends SuperhumanDocsException {
     private final Integer retryAfterSeconds;
 
-    public CodaRateLimitException(String message) {
+    public SuperhumanDocsRateLimitException(String message) {
         super(message, 429);
         this.retryAfterSeconds = null;
     }
 
-    public CodaRateLimitException(String message, Integer retryAfterSeconds) {
+    public SuperhumanDocsRateLimitException(String message, Integer retryAfterSeconds) {
         super(message, 429);
         this.retryAfterSeconds = retryAfterSeconds;
     }
 
-    public CodaRateLimitException(String message, Throwable cause) {
+    public SuperhumanDocsRateLimitException(String message, Throwable cause) {
         super(message, 429, cause);
         this.retryAfterSeconds = null;
     }

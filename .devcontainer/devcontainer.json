@@ -1,10 +1,10 @@
 {
-  "name": "plugin-template",
+  "name": "plugin-superhuman-docs",
   "build": {
     "context": ".",
     "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/workspaces/plugin-template",
+  "workspaceFolder": "/workspaces/plugin-superhuman-docs",
   "forwardPorts": [8080],
   "customizations": {
     "vscode": {

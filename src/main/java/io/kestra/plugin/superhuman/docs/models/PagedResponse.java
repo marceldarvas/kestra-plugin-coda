@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 import java.util.List;
 
 /**
- * Generic wrapper for paginated responses from the Coda API.
+ * Generic wrapper for paginated responses from the Superhuman Docs API.
  */
 @Builder
 @Getter

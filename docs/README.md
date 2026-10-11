@@ -1,6 +1,6 @@
 # Documentation Index
 
-Welcome to the Kestra Coda Plugin documentation! This index will help you find the information you need.
+Welcome to the Kestra Superhuman Docs (formerly Coda) Plugin documentation! This index will help you find the information you need.
 
 ## 🚀 Quick Navigation
 
@@ -10,7 +10,7 @@ Start here to get up and running quickly:
 
 ### For Active Development
 Reference materials for building the plugin:
-2. **[Coda API Guide](./CODA_API_GUIDE.md)** - Comprehensive API reference with examples
+2. **[Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)** - Comprehensive API reference with examples
 3. **[Quick Reference](./QUICK_REFERENCE.md)** - Cheat sheet for common operations
 4. **[Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)** - Development plan and timeline
 
@@ -23,8 +23,8 @@ Reference materials for building the plugin:
 
 **Contents**:
 - Prerequisites and environment setup
-- Getting your Coda API token
-- Creating a test Coda document
+- Getting your Superhuman Docs API token
+- Creating a test Superhuman Docs document
 - Building your first task (ListTables example)
 - Testing strategies
 - Local development with Kestra
@@ -34,8 +34,8 @@ Reference materials for building the plugin:
 
 ---
 
-### 2. Coda API Guide (25KB)
-**Purpose**: Complete reference for the Coda API
+### 2. Superhuman Docs API Guide (25KB)
+**Purpose**: Complete reference for the Superhuman Docs API
 
 **Contents**:
 - **Authentication**: Getting and using API tokens
@@ -44,7 +44,7 @@ Reference materials for building the plugin:
 - **Columns Operations**: List columns, column types
 - **Rows Operations**: List, insert, update, upsert, delete rows
 - **Comments**: API limitations and workarounds
-- **Automations & Webhooks**: Triggering Coda automations
+- **Automations & Webhooks**: Triggering Superhuman Docs automations
 - **Code Examples**: Java implementations with OkHttp
 - **Best Practices**: Error handling, pagination, validation
 - **Resources**: Links to official documentation
@@ -94,13 +94,13 @@ Reference materials for building the plugin:
 → Read **[Getting Started Guide](./GETTING_STARTED.md)** from top to bottom
 
 ### "I need to know how to call a specific API endpoint"
-→ Check **[Coda API Guide](./CODA_API_GUIDE.md)** or **[Quick Reference](./QUICK_REFERENCE.md)**
+→ Check **[Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)** or **[Quick Reference](./QUICK_REFERENCE.md)**
 
 ### "I want to understand the project structure"
 → See Phase 1 in **[Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)**
 
 ### "I need a code example"
-→ Look in **[Coda API Guide](./CODA_API_GUIDE.md)** "Code Examples" section or **[Getting Started Guide](./GETTING_STARTED.md)** Step 6
+→ Look in **[Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)** "Code Examples" section or **[Getting Started Guide](./GETTING_STARTED.md)** Step 6
 
 ### "I want to know what to build next"
 → Follow the phases in **[Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)**
@@ -115,21 +115,21 @@ Reference materials for building the plugin:
 ### For Beginners
 1. **Getting Started Guide** - Understand the basics
 2. **Quick Reference** - Familiarize yourself with the API
-3. **Coda API Guide** - Deep dive into details as needed
+3. **Superhuman Docs API Guide** - Deep dive into details as needed
 4. **Implementation Roadmap** - Understand the big picture
 
 ### For Experienced Developers
 1. **Quick Reference** - Get the essentials
 2. **Implementation Roadmap** - See the plan
-3. **Coda API Guide** - Reference as needed
+3. **Superhuman Docs API Guide** - Reference as needed
 4. **Getting Started Guide** - For setup only
 
 ---
 
 ## 🔍 Key Concepts
 
-### Coda Resources
-- **Document (Doc)**: A Coda document, identified by docId
+### Superhuman Docs Resources
+- **Document (Doc)**: A Superhuman Docs document, identified by docId
 - **Table**: A table within a document, identified by tableId
 - **Column**: A column in a table, identified by columnId
 - **Row**: A row in a table, identified by rowId
@@ -152,11 +152,11 @@ Reference materials for building the plugin:
 
 ## 🔗 External Resources
 
-### Coda Official Documentation
-- [Coda API Reference](https://coda.io/developers)
-- [Getting Started Guide](https://coda.io/@oleg/getting-started-guide-coda-api)
-- [Coda Community](https://community.coda.io/)
-- [Postman Collection](https://www.postman.com/codaio/coda-workspace/)
+### Superhuman Docs Official Documentation
+- [Superhuman Docs API Reference](https://docs.superhuman.com/developers/apis/v1)
+- [Getting Started Guide (legacy Coda link)](https://coda.io/@oleg/getting-started-guide-coda-api)
+- [Coda Community (legacy Coda link)](https://community.coda.io/)
+- [Postman Collection (legacy Coda link)](https://www.postman.com/codaio/coda-workspace/)
 
 ### Kestra Resources
 - [Kestra Documentation](https://kestra.io/docs)
@@ -198,10 +198,10 @@ When contributing to the documentation:
 ## 🆘 Need Help?
 
 1. Check the **[Getting Started Guide](./GETTING_STARTED.md)** first
-2. Search the **[Coda API Guide](./CODA_API_GUIDE.md)** for your topic
+2. Search the **[Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)** for your topic
 3. Use the **[Quick Reference](./QUICK_REFERENCE.md)** for syntax
 4. Consult the **[Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)** for architecture
-5. If still stuck, check [Coda Community](https://community.coda.io/) or create an issue
+5. If still stuck, check the [Coda community forum](https://community.coda.io/) or create an issue
 
 ---
 

@@ -7,3 +7,14 @@ kestra:
     type: local
     local:
       base-path: /tmp/unittest
+  # Kestra 2.0: workers talk to the controller over gRPC. Use a random port so that
+  # concurrent builds on the same machine do not collide on the default 50051.
+  controller:
+    port: ${random.port}
+  worker:
+    controllers:
+      type: STATIC
+      static:
+        endpoints:
+          - host: localhost
+            port: ${kestra.controller.port}
