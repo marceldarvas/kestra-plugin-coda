@@ -13,6 +13,7 @@ name: Release Plugin
 #    and commits the next -SNAPSHOT version on main.
 # 3. Builds the shadow jar from the tag and attaches it to a GitHub Release.
 #    That jar is what you drop into Kestra's plugins directory.
+# If a run fails after tagging, re-running it resumes from step 3 (tag exists, no Release yet).
 #
 # Maven Central publishing is intentionally not wired up: the project group is
 # `io.kestra.plugin`, a Maven Central namespace owned by Kestra.
@@ -67,6 +68,8 @@ jobs:
       - name: Validate inputs
         id: versions
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if [[ "$GITHUB_REF_NAME" != "main" ]]; then
@@ -83,17 +86,24 @@ jobs:
           if [[ ! "$NEXT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
             echo "::error::nextVersion must be X.Y.Z-SNAPSHOT, got '$NEXT_VERSION'"; exit 1
           fi
+          RESUME=false
           if git rev-parse -q --verify "refs/tags/v${RELEASE_VERSION}" >/dev/null; then
-            echo "::error::Tag v${RELEASE_VERSION} already exists"; exit 1
+            if gh release view "v${RELEASE_VERSION}" >/dev/null 2>&1; then
+              echo "::error::Release v${RELEASE_VERSION} already exists"; exit 1
+            fi
+            # A previous run tagged but failed before publishing: resume from the build step.
+            echo "::notice::Tag v${RELEASE_VERSION} exists without a GitHub Release; resuming publication"
+            RESUME=true
           fi
           echo "next=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "resume=${RESUME}" >> "$GITHUB_OUTPUT"
           echo "Releasing ${RELEASE_VERSION}, next ${NEXT_VERSION}, dryRun=${DRY_RUN}"
 
       - name: Test
         run: ./gradlew check
 
       - name: Release - Tag and bump version
-        if: ${{ !inputs.dryRun }}
+        if: ${{ !inputs.dryRun && steps.versions.outputs.resume != 'true' }}
         env:
           NEXT_VERSION: ${{ steps.versions.outputs.next }}
         run: |
