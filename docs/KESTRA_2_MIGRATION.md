@@ -31,7 +31,7 @@ The Coda-specific code (`CodaTask`, `client`, `models`, `exceptions`) used no re
   `inject-bom-versions` 1.0.2 → 1.2.11, shadow 9.4.0 → 9.6.1, gradle-release 3.1.0 → 3.2.0.
 - Allure/AspectJ test agent removed. The `indexer` test dependency was added to match plugin-template `fix/v2`.
 - `lombok.config` pins `@Jacksonized` to Jackson 2. That is lombok's default; the pin only silences a warning.
-- `main.yml` passes `java-version: '25'` to the shared kestra-io workflow (which defaults to 21).
+- CI is `.github/workflows/ci.yml`: self-contained, Java 25, `check` + `shadowJar` on `ubuntu-latest`. It replaces `main.yml` and the shared kestra-io `plugins.yml`. That workflow targets the kestra-io-only `kestra-private-4cpu-4gb` runner on private repos (jobs queued until cancelled), and its daily cron let GitHub auto-disable the workflow for inactivity.
 - Dev `Dockerfile` pinned to `kestra/kestra:v2.0`; devcontainer on Temurin 25.
 - `release.yml` is now self-contained (see below).
 
