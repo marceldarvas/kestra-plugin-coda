@@ -1,13 +1,13 @@
-# Getting Started with Coda Plugin Development
+# Getting Started with Superhuman Docs Plugin Development
 
-This guide will help you get started with developing the Kestra Coda plugin quickly.
+This guide will help you get started with developing the Kestra Superhuman Docs (formerly Coda) plugin quickly.
 
 ## Prerequisites
 
 - Java 25 or higher (required by Kestra 2.0)
 - Gradle (included via wrapper)
 - Docker (for local Kestra development)
-- A Coda account with API access
+- A Superhuman Docs account with API access
 - An IDE (IntelliJ IDEA, VS Code, or Eclipse)
 
 ## Step 1: Set Up Your Development Environment
@@ -34,31 +34,29 @@ java -version
 
 This will compile the code and run existing tests to ensure everything is working.
 
-## Step 2: Get Your Coda API Token
+## Step 2: Get Your Superhuman Docs API Token
 
-1. Sign in to [Coda](https://coda.io)
-2. Click on your profile picture → Settings
-3. Navigate to the "Account" tab
-4. Scroll down to "API Settings"
-5. Click "Generate API Token"
-6. Copy the token (you'll need it for testing)
+1. Sign in to [Superhuman Docs](https://docs.superhuman.com)
+2. Open your Superhuman Docs account settings and find the API settings
+3. Generate a new API token
+4. Copy the token (you'll need it for testing)
 
 ⚠️ **Important**: Keep your API token secure! Never commit it to version control.
 
-## Step 3: Create a Test Coda Document
+## Step 3: Create a Test Superhuman Docs Document
 
 For development and testing, create a simple test document:
 
-1. Create a new Coda doc
+1. Create a new Superhuman Docs doc
 2. Add a table named "Test Tasks" with these columns:
    - Task Name (Text)
    - Status (Select: Not Started, In Progress, Completed)
    - Priority (Number)
    - Due Date (Date)
 3. Add a few sample rows
-4. Note the document ID from the URL: `https://coda.io/d/_dABC123XYZ` → `ABC123XYZ`
+4. Note the document ID from the URL: `https://docs.superhuman.com/d/_dABC123XYZ` → `ABC123XYZ`
 
-## Step 4: Test the Coda API Manually
+## Step 4: Test the Superhuman Docs API Manually
 
 Before coding, verify API access with curl:
 
@@ -86,7 +84,7 @@ kestra-plugin-coda/
 │   ├── main/
 │   │   └── java/
 │   │       └── io/kestra/plugin/
-│   │           └── coda/              # Your plugin code goes here
+│   │           └── superhuman/docs/    # Your plugin code goes here
 │   │               ├── ListTables.java
 │   │               ├── ListColumns.java
 │   │               ├── InsertRow.java
@@ -94,7 +92,7 @@ kestra-plugin-coda/
 │   └── test/
 │       └── java/
 │           └── io/kestra/plugin/
-│               └── coda/              # Your tests go here
+│               └── superhuman/docs/    # Your tests go here
 ├── docs/                              # Documentation (already created)
 ├── build.gradle                       # Build configuration
 └── README.md
@@ -102,10 +100,10 @@ kestra-plugin-coda/
 
 ## Step 6: Create Your First Task - ListTables
 
-Create a new file: `src/main/java/io/kestra/plugin/coda/ListTables.java`
+Create a new file: `src/main/java/io/kestra/plugin/superhuman/docs/ListTables.java`
 
 ```java
-package io.kestra.plugin.coda;
+package io.kestra.plugin.superhuman.docs;
 
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
@@ -128,15 +126,15 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "List all tables in a Coda document",
-    description = "Retrieves a list of all tables in the specified Coda document"
+    title = "List all tables in a Superhuman Docs document",
+    description = "Retrieves a list of all tables in the specified Superhuman Docs document"
 )
 @Plugin(
     examples = {
         @io.kestra.core.models.annotations.Example(
             title = "List all tables in a document",
             code = {
-                "apiToken: \"{{ secret('CODA_API_TOKEN') }}\"",
+                "apiToken: \"{{ secret('SUPERHUMAN_DOCS_API_TOKEN') }}\"",
                 "docId: \"abc123xyz\""
             }
         )
@@ -145,14 +143,14 @@ import java.util.List;
 public class ListTables extends Task implements RunnableTask<ListTables.Output> {
     
     @Schema(
-        title = "Coda API Token",
-        description = "Your Coda API token for authentication"
+        title = "Superhuman Docs API Token",
+        description = "Your Superhuman Docs API token for authentication"
     )
     private Property<String> apiToken;
     
     @Schema(
         title = "Document ID",
-        description = "The Coda document ID"
+        description = "The Superhuman Docs document ID"
     )
     private Property<String> docId;
     
@@ -211,7 +209,7 @@ Add OkHttp to your `build.gradle`:
 dependencies {
     // Existing dependencies...
     
-    // HTTP Client for Coda API
+    // HTTP Client for Superhuman Docs API
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     
     // JSON Processing
@@ -221,10 +219,10 @@ dependencies {
 
 ## Step 7: Create a Test
 
-Create: `src/test/java/io/kestra/plugin/coda/ListTablesTest.java`
+Create: `src/test/java/io/kestra/plugin/superhuman/docs/ListTablesTest.java`
 
 ```java
-package io.kestra.plugin.coda;
+package io.kestra.plugin.superhuman.docs;
 
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
@@ -245,11 +243,11 @@ class ListTablesTest {
     @Test
     void run() throws Exception {
         // Skip if no API token provided (for CI/CD)
-        String apiToken = System.getenv("CODA_API_TOKEN");
-        String docId = System.getenv("CODA_DOC_ID");
+        String apiToken = System.getenv("SUPERHUMAN_DOCS_API_TOKEN");
+        String docId = System.getenv("SUPERHUMAN_DOCS_DOC_ID");
         
         if (apiToken == null || docId == null) {
-            System.out.println("Skipping test - CODA_API_TOKEN or CODA_DOC_ID not set");
+            System.out.println("Skipping test - SUPERHUMAN_DOCS_API_TOKEN or SUPERHUMAN_DOCS_DOC_ID not set");
             return;
         }
         
@@ -275,8 +273,8 @@ class ListTablesTest {
 ./gradlew build
 
 # Run tests
-export CODA_API_TOKEN="your-api-token"
-export CODA_DOC_ID="your-doc-id"
+export SUPERHUMAN_DOCS_API_TOKEN="your-api-token"
+export SUPERHUMAN_DOCS_DOC_ID="your-doc-id"
 ./gradlew test
 ```
 
@@ -291,8 +289,8 @@ export CODA_DOC_ID="your-doc-id"
 ### Run Kestra with your plugin
 
 ```bash
-docker build -t kestra-coda .
-docker run --rm -p 8080:8080 kestra-coda server local
+docker build -t kestra-superhuman-docs .
+docker run --rm -p 8080:8080 kestra-superhuman-docs server local
 ```
 
 ### Create a test flow
@@ -300,13 +298,13 @@ docker run --rm -p 8080:8080 kestra-coda server local
 Open http://localhost:8080 and create a new flow:
 
 ```yaml
-id: test-coda-plugin
+id: test-superhuman-docs-plugin
 namespace: io.kestra.tests
 
 tasks:
   - id: list_tables
-    type: io.kestra.plugin.coda.ListTables
-    apiToken: "{{ secret('CODA_API_TOKEN') }}"
+    type: io.kestra.plugin.superhuman.docs.ListTables
+    apiToken: "{{ secret('SUPERHUMAN_DOCS_API_TOKEN') }}"
     docId: "your-doc-id"
 ```
 
@@ -339,7 +337,7 @@ try (Response response = client.newCall(request).execute()) {
     if (!response.isSuccessful()) {
         String errorBody = response.body().string();
         throw new Exception(String.format(
-            "Coda API error: HTTP %d - %s. Response: %s",
+            "Superhuman Docs API error: HTTP %d - %s. Response: %s",
             response.code(),
             response.message(),
             errorBody
@@ -364,7 +362,7 @@ String token = runContext.render(apiToken).as(String.class).orElseThrow();
 Consider creating base classes or utilities:
 
 ```java
-public abstract class CodaTask extends Task {
+public abstract class SuperhumanDocsTask extends Task {
     protected Property<String> apiToken;
     protected Property<String> docId;
     
@@ -391,7 +389,7 @@ public abstract class CodaTask extends Task {
 - Test error handling
 
 ### Integration Tests
-- Use actual Coda API
+- Use actual Superhuman Docs API
 - Create/cleanup test data
 - Test pagination and edge cases
 
@@ -402,25 +400,25 @@ public abstract class CodaTask extends Task {
 
 ## Resources
 
-- **[Coda API Guide](./CODA_API_GUIDE.md)** - Complete API reference
+- **[Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)** - Complete API reference
 - **[Quick Reference](./QUICK_REFERENCE.md)** - Handy cheat sheet
 - **[Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)** - Development plan
 - **[Kestra Plugin Guide](https://kestra.io/docs/plugin-developer-guide/)** - Official Kestra docs
 
 ## Need Help?
 
-- **Coda API Issues**: Check [Coda Community](https://community.coda.io/)
+- **Superhuman Docs API Issues**: Check the [Coda community forum](https://community.coda.io/) (legacy Coda link)
 - **Kestra Plugin Issues**: Check [Kestra Docs](https://kestra.io/docs)
 - **General Questions**: Create an issue in this repository
 
 ## Next Steps
 
 1. ✅ Complete this getting started guide
-2. 📖 Review the [Coda API Guide](./CODA_API_GUIDE.md)
+2. 📖 Review the [Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)
 3. 🗺️ Follow the [Implementation Roadmap](./IMPLEMENTATION_ROADMAP.md)
 4. 💻 Start coding!
 5. 🧪 Write tests
 6. 📝 Document your work
 7. 🚀 Ship it!
 
-Good luck with your Coda plugin development! 🎉
+Good luck with your Superhuman Docs plugin development! 🎉

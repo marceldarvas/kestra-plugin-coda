@@ -1,11 +1,11 @@
-# Coda Plugin Implementation Roadmap
+# Superhuman Docs Plugin Implementation Roadmap
 
-This document outlines the recommended approach for implementing Coda plugin features in Kestra.
+This document outlines the recommended approach for implementing Superhuman Docs (formerly Coda) plugin features in Kestra.
 
 ## Phase 1: Foundation (Core Infrastructure)
 
 ### 1.1 Authentication & Configuration
-- [ ] Create `CodaConnection` class for managing API credentials
+- [ ] Create `SuperhumanDocsConnection` class for managing API credentials
 - [ ] Implement secure API token storage using Kestra's secret management
 - [ ] Add connection validation task
 - [ ] Create base HTTP client with proper headers and authentication
@@ -18,13 +18,13 @@ This document outlines the recommended approach for implementing Coda plugin fea
 ```java
 @SuperBuilder
 @NoArgsConstructor
-public abstract class CodaTask extends Task {
-    @Schema(title = "Coda API Token", description = "Your Coda API token")
+public abstract class SuperhumanDocsTask extends Task {
+    @Schema(title = "Superhuman Docs API Token", description = "Your Superhuman Docs API token")
     @PluginProperty(dynamic = true)
     @NotNull
     protected String apiToken;
     
-    @Schema(title = "Document ID", description = "The Coda document ID")
+    @Schema(title = "Document ID", description = "The Superhuman Docs document ID")
     @PluginProperty(dynamic = true)
     @NotNull
     protected String docId;
@@ -44,10 +44,10 @@ public abstract class CodaTask extends Task {
 - [ ] Add error handling and exception classes
 
 **Key Models:**
-- `CodaTable`
-- `CodaColumn`
-- `CodaRow`
-- `CodaCell`
+- `Table`
+- `Column`
+- `Row`
+- `Cell`
 - `PagedResponse<T>`
 
 ---
@@ -64,17 +64,17 @@ public abstract class CodaTask extends Task {
 
 **Task Example:**
 ```java
-@Schema(title = "List Tables", description = "List all tables in a Coda document")
+@Schema(title = "List Tables", description = "List all tables in a Superhuman Docs document")
 @Plugin(examples = {
     @Example(
         title = "List all tables in a document",
         code = {
-            "apiToken: \"{{ secret('CODA_API_TOKEN') }}\"",
+            "apiToken: \"{{ secret('SUPERHUMAN_DOCS_API_TOKEN') }}\"",
             "docId: \"abc123\""
         }
     )
 })
-public class ListTables extends CodaTask implements RunnableTask<ListTables.Output> {
+public class ListTables extends SuperhumanDocsTask implements RunnableTask<ListTables.Output> {
     @Override
     public Output run(RunContext runContext) throws Exception {
         // Implementation
@@ -124,8 +124,8 @@ public class ListTables extends CodaTask implements RunnableTask<ListTables.Outp
 
 **Task Example:**
 ```java
-@Schema(title = "Insert Row", description = "Insert a new row into a Coda table")
-public class InsertRow extends CodaTask implements RunnableTask<InsertRow.Output> {
+@Schema(title = "Insert Row", description = "Insert a new row into a Superhuman Docs table")
+public class InsertRow extends SuperhumanDocsTask implements RunnableTask<InsertRow.Output> {
     @Schema(title = "Table ID")
     @NotNull
     private Property<String> tableId;
@@ -172,13 +172,13 @@ public class InsertRow extends CodaTask implements RunnableTask<InsertRow.Output
 ## Phase 4: Automation & Webhooks
 
 ### 4.1 Webhook Trigger
-- [ ] `TriggerWebhook` - Trigger a Coda automation via webhook
+- [ ] `TriggerWebhook` - Trigger a Superhuman Docs automation via webhook
   - Input: webhookUrl, payload (JSON object)
   - Output: Success confirmation and response
 
 **Task Example:**
 ```java
-@Schema(title = "Trigger Webhook", description = "Trigger a Coda automation via webhook")
+@Schema(title = "Trigger Webhook", description = "Trigger a Superhuman Docs automation via webhook")
 public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.Output> {
     @Schema(title = "Webhook URL")
     @NotNull
@@ -200,7 +200,7 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
 ```
 
 ### 4.2 Webhook Receiver (Optional)
-- [ ] Create Kestra trigger that listens for Coda webhooks
+- [ ] Create Kestra trigger that listens for Superhuman Docs webhooks
 - [ ] Parse incoming webhook payloads
 - [ ] Validate webhook authentication
 
@@ -222,8 +222,8 @@ public class TriggerWebhook extends Task implements RunnableTask<TriggerWebhook.
 - [ ] Generate column type mappings for data validation
 
 ### 5.4 Data Sync
-- [ ] `SyncFromCoda` - Pull data from Coda and store in Kestra internal storage
-- [ ] `SyncToCoda` - Push data from Kestra to Coda tables
+- [ ] `SyncFromSuperhumanDocs` - Pull data from Superhuman Docs and store in Kestra internal storage
+- [ ] `SyncToSuperhumanDocs` - Push data from Kestra to Superhuman Docs tables
 - [ ] Support for incremental syncs based on timestamps
 
 ---
@@ -246,13 +246,13 @@ void testListTables() throws Exception {
 ```
 
 ### Integration Tests
-- [ ] Test against actual Coda API (requires test account)
+- [ ] Test against actual Superhuman Docs API (requires test account)
 - [ ] Create test document with known structure
 - [ ] Verify CRUD operations end-to-end
 - [ ] Test pagination with large datasets
 
 ### Test Fixtures
-- [ ] Create sample Coda document for testing
+- [ ] Create sample Superhuman Docs document for testing
 - [ ] Generate test data for various column types
 - [ ] Document test setup in README
 
@@ -406,7 +406,7 @@ The plugin is considered complete when:
 - ✅ All core CRUD operations are implemented and tested
 - ✅ Authentication and error handling are robust
 - ✅ Documentation is comprehensive with examples
-- ✅ Integration tests pass against live Coda API
+- ✅ Integration tests pass against live Superhuman Docs API
 - ✅ Code follows Kestra plugin conventions
 - ✅ All tasks have proper logging and error messages
 - ✅ Webhook automation triggering works reliably
@@ -415,14 +415,14 @@ The plugin is considered complete when:
 
 ## Support & Maintenance
 
-### Known Limitations (from Coda API)
+### Known Limitations (from Superhuman Docs API)
 - Cannot create tables via API
 - Comments are not accessible via API
 - Views are read-only
 - Rate limits are not publicly documented
 
 ### Future Enhancements
-- Add support for Coda Packs integration (if API becomes available)
+- Add support for Superhuman Docs Packs integration (if API becomes available)
 - Implement comment operations (when API supports it)
 - Add support for creating tables (if API adds this feature)
 - Enhanced formula support
@@ -431,6 +431,6 @@ The plugin is considered complete when:
 ---
 
 For questions or contributions, refer to:
-- [Coda API Guide](./CODA_API_GUIDE.md)
+- [Superhuman Docs API Guide](./SUPERHUMAN_DOCS_API_GUIDE.md)
 - [Quick Reference](./QUICK_REFERENCE.md)
 - [Kestra Plugin Developer Guide](https://kestra.io/docs/plugin-developer-guide/)

@@ -1,13 +1,17 @@
-# Kestra 2.0 migration spec — Coda plugin
+# Kestra 2.0 migration spec — Superhuman Docs plugin
 
 Status: implemented on branch `claude/kestra-2-plugin-readiness-r36f3i`.
 Target: Kestra **2.0.5** (`io.kestra:platform:2.0.5`), Java **25**.
 
+The plugin integrates Superhuman Docs (formerly Coda). It was renamed on the same branch; see
+[Rename to Superhuman Docs](#rename-to-superhuman-docs). Class names in the tables below are the ones at migration time.
+
 ## Why
 
 Kestra 2.0 (tagged 2026-09-07) is compiled to Java 25 bytecode (class file major 69) and removes APIs that were
-deprecated in 1.x. The repository currently contains Coda client/model code plus the Kestra plugin-template
-scaffolding (`io.kestra.plugin.templates.Example` / `Trigger`). The scaffolding used removed APIs.
+deprecated in 1.x. At migration time the repository contained Coda client/model code plus the Kestra
+plugin-template scaffolding (`io.kestra.plugin.templates.Example` / `Trigger`). The scaffolding used removed APIs; it
+was later removed (see below).
 
 ## Upstream changes that affect this repo (verified)
 
@@ -43,19 +47,39 @@ workflow:
 It also has a `dryRun` input. Maven Central publishing is not wired up: the group `io.kestra.plugin` is a namespace
 owned by Kestra.
 
+## Rename to Superhuman Docs
+
+Coda was renamed to Superhuman Docs on 2026-07-08 (new web domain https://docs.superhuman.com; coda.io doc links
+redirect there). The plugin follows:
+
+- Gradle project `plugin-template` → `plugin-superhuman-docs`; the jar is `plugin-superhuman-docs-<version>.jar`.
+- Manifest: `X-Kestra-Title: Superhuman Docs`, `X-Kestra-Group: io.kestra.plugin.superhuman.docs`, real description.
+- Package `io.kestra.plugin.coda` → `io.kestra.plugin.superhuman.docs`. `CodaTask` → `SuperhumanDocsTask`,
+  `CodaConnection` → `SuperhumanDocsConnection`, `Coda*Exception` → `SuperhumanDocs*Exception`; models drop the
+  prefix (`Table`, `Column`, `Row`, `RowCell`, `RowReference`).
+- The API base URL stays `https://coda.io/apis/v1`: the official reference
+  (https://docs.superhuman.com/developers/apis/v1, "Superhuman Docs API 1.6.0") still documents it, and Superhuman's
+  help center says existing coda.io API endpoints keep working.
+- The plugin-template scaffolding (`io.kestra.plugin.templates.Example` / `Trigger`, their tests and
+  `flows/example.yaml`) was removed: it registered fake tasks in users' Kestra. `SuperhumanDocsConnectionTest`
+  (WireMock, dynamic port) replaces it, using a package-private constructor that takes a base URL.
+- `docs/CODA_API_GUIDE.md` → `docs/SUPERHUMAN_DOCS_API_GUIDE.md`.
+
 ## Verification
 
 - Baseline on Kestra 1.0.0 / JDK 21: 2/2 tests green.
-- After: `./gradlew clean check shadowJar` on JDK 25: **2 tests, 0 failures** (re-run independently).
+- After the migration: `./gradlew clean check shadowJar` on JDK 25: **2 tests, 0 failures** (re-run independently).
+- After the rename: `./gradlew clean check shadowJar` on JDK 25: **7 tests, 0 failures** (`SuperhumanDocsConnectionTest`).
 - The shadow jar's classes are Java 25 bytecode, and the jar manifest carries all five `X-Kestra-*` attributes.
 - The release workflow passes `actionlint` (with shellcheck).
 - **Not verified:** a run on a live Kestra 2.0 server; the Temurin 25 devcontainer download URL.
 
 ## Known pre-existing issues (not changed here)
 
-- No Coda task is implemented yet. `ListTables`, mentioned in the docs, does not exist.
-- `settings.gradle` has `rootProject.name = 'plugin-template'` and the main sources still carry the
-  `io.kestra.plugin.templates` package. The jar is `plugin-template-<version>.jar`.
+- No Superhuman Docs task is implemented yet. `ListTables` and the other tasks in the docs are planned; only the
+  client, models and the `SuperhumanDocsTask` base class exist.
+- The Maven POM metadata in `build.gradle` still points at `https://github.com/kestra-io/${project.name}` (not
+  published, see above).
 
 ## Sources
 

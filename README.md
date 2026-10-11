@@ -36,21 +36,24 @@
 <p align="center" style="color:grey;"><i>Get started with Kestra in 3 minutes.</i></p>
 
 
-# Kestra Plugin for Coda
+# Kestra Plugin for Superhuman Docs
 
-> A Kestra plugin for integrating with Coda documents and tables
+> A Kestra plugin for integrating with Superhuman Docs (formerly Coda) documents and tables
 
-This plugin enables Kestra workflows to interact with [Coda](https://coda.io) documents through the Coda API. It provides tasks for managing tables, columns, rows, and triggering automations.
+This plugin enables Kestra workflows to interact with [Superhuman Docs](https://docs.superhuman.com) documents through the Superhuman Docs API. Coda was renamed to Superhuman Docs on 2026-07-08; existing coda.io doc links redirect to docs.superhuman.com, and the API is still served at `https://coda.io/apis/v1`.
+
+> [!NOTE]
+> **Status:** the API client, models and the `SuperhumanDocsTask` base class are in place; the concrete tasks listed below (such as `ListTables`) are planned. See the [Implementation Roadmap](./docs/IMPLEMENTATION_ROADMAP.md).
 
 ![Kestra orchestrator](https://kestra.io/video.gif)
 
 ## Features
 
-- **Table Operations**: List and discover tables in Coda documents
+- **Table Operations**: List and discover tables in Superhuman Docs documents
 - **Column Management**: Retrieve column configurations and metadata
-- **Row Operations**: Insert, update, upsert, and delete rows in Coda tables
-- **Automations**: Trigger Coda automations via webhooks
-- **Data Retrieval**: Query and fetch data from Coda tables with pagination support
+- **Row Operations**: Insert, update, upsert, and delete rows in Superhuman Docs tables
+- **Automations**: Trigger Superhuman Docs automations via webhooks
+- **Data Retrieval**: Query and fetch data from Superhuman Docs tables with pagination support
 
 ## Documentation
 
@@ -62,7 +65,7 @@ This plugin enables Kestra workflows to interact with [Coda](https://coda.io) do
   - Testing strategies
   - Local development with Kestra
 
-- **[Coda API Guide](./docs/CODA_API_GUIDE.md)** - Complete reference for Coda API including:
+- **[Superhuman Docs API Guide](./docs/SUPERHUMAN_DOCS_API_GUIDE.md)** - Complete reference for the Superhuman Docs API including:
   - Authentication and setup
   - Tables, columns, and rows operations
   - Comments limitations and workarounds
@@ -84,23 +87,23 @@ This plugin enables Kestra workflows to interact with [Coda](https://coda.io) do
 
 ### Authentication
 
-To use this plugin, you need a Coda API token:
+To use this plugin, you need a Superhuman Docs API token:
 
-1. Sign in to your Coda account
-2. Go to Account Settings → Developer/API Settings
+1. Sign in to Superhuman Docs at https://docs.superhuman.com
+2. Open your Superhuman Docs account settings and find the API settings
 3. Generate a new API token
 4. Store it securely in Kestra's secret management
 
 ### Example Usage
 
 ```yaml
-id: coda-example
-namespace: io.kestra.plugin.coda
+id: superhuman-docs-example
+namespace: company.team
 
 tasks:
   - id: list_tables
-    type: io.kestra.plugin.coda.ListTables
-    apiToken: "{{ secret('CODA_API_TOKEN') }}"
+    type: io.kestra.plugin.superhuman.docs.ListTables # planned task
+    apiToken: "{{ secret('SUPERHUMAN_DOCS_API_TOKEN') }}"
     docId: "abc123xyz"
 ```
 
@@ -122,12 +125,12 @@ tasks:
 
 ## API Limitations
 
-⚠️ Please note the following Coda API limitations:
+⚠️ Please note the following Superhuman Docs API limitations:
 
 - **Cannot create tables** programmatically (only list existing tables)
 - **Comments are not accessible** via the API
 - **Views are read-only** (use base tables for modifications)
-- Rate limits apply (not publicly documented by Coda)
+- Rate limits apply (not publicly documented)
 
 ## Running the project locally
 
@@ -162,10 +165,9 @@ Go to http://localhost:8080, your plugin will be available to use.
 
 ## Additional Resources
 
-### Coda Resources
-* **Coda API Documentation**: [https://coda.io/developers](https://coda.io/developers)
-* **Getting Started Guide**: [https://coda.io/@oleg/getting-started-guide-coda-api](https://coda.io/@oleg/getting-started-guide-coda-api)
-* **Coda Community**: [https://community.coda.io/](https://community.coda.io/)
+### Superhuman Docs Resources
+* **Superhuman Docs API reference**: [https://docs.superhuman.com/developers/apis/v1](https://docs.superhuman.com/developers/apis/v1)
+* **Superhuman Docs**: [https://docs.superhuman.com](https://docs.superhuman.com)
 
 ### Kestra Resources
 * **Full documentation**: [kestra.io/docs](https://kestra.io/docs)
