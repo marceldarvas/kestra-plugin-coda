@@ -1,4 +1,4 @@
-package io.kestra.plugin.coda.models;
+package io.kestra.plugin.superhuman.docs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a row in a Coda table.
+ * Represents a row in a Superhuman Docs table.
  */
 @Builder
 @Getter
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CodaRow {
+public class Row {
     @Schema(
         title = "Row ID",
         description = "The unique identifier for this row"
@@ -79,5 +79,5 @@ public class CodaRow {
         description = "Information about the parent row (for hierarchical tables)"
     )
     @JsonProperty("parent")
-    private CodaRowReference parent;
+    private RowReference parent;
 }
